@@ -67,3 +67,40 @@ body {
     aspect-ratio: 1/1; /* Ép ảnh thành hình vuông cho đều */
     object-fit: cover;
 }
+/* --- PHẦN FIX CON LÉP TO --- */
+
+/* Khung bọc mascot */
+.lep-wrap {
+    position: fixed;    /* Luôn đứng yên một chỗ khi cuộn trang */
+    bottom: 20px;       /* Cách đáy 20px */
+    right: 20px;        /* Cách phải 20px */
+    width: 80px;        /* Độ rộng con Lép (M có thể chỉnh 70-100 tùy ý) */
+    height: 80px;       /* Chiều cao tương ứng */
+    z-index: 9999;      /* Nổi lên trên cùng tất cả các thành phần */
+}
+
+/* Ảnh base và ảnh nháy mắt */
+.lep-base, 
+.lep-blink {
+    width: 100%;
+    height: 100%;
+    position: absolute; /* Chồng hai ảnh lên nhau */
+    top: 0;
+    left: 0;
+    object-fit: contain;
+}
+
+/* Hiệu ứng nháy mắt (Cái này nếu m chưa có trong file cũ thì dán vào luôn) */
+.lep-blink {
+    animation: blink-anim 3s steps(1) infinite;
+}
+
+@keyframes blink-anim {
+    0%, 90% { opacity: 0; } /* Ẩn ảnh nháy mắt hầu hết thời gian */
+    91%, 100% { opacity: 1; } /* Hiện ra chớp nhoáng rồi lại ẩn */
+}
+
+/* Thêm khoảng trống ở đáy body để không bị mascot che mất sản phẩm cuối cùng */
+body {
+    padding-bottom: 100px;
+}
