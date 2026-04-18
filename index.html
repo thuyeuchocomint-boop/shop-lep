@@ -1,47 +1,55 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LÉP 🌱</title>
-
-<link rel="stylesheet" href="style.css">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LÉP 🌱</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-<header class="profile-section">
-  <div class="avatar-wrap">
-    <img id="display-avatar" src="" class="avatar-img" alt="Lép">
+  <header class="profile-section">
+    <div class="avatar-wrap">
+      <img id="display-avatar" src="" class="avatar-img" alt="Lép">
+    </div>
+    
+    <h1 id="display-name">Lép là Leaf 🌱</h1>
+    <p id="display-bio">Đang tải tiểu sử...</p>
+    <div id="display-status" class="status-bubble"></div>
+
+    <div class="social-links">
+      <a id="link-fb" href="#" target="_blank">Facebook</a>
+      <a id="link-ig" href="#" target="_blank">Instagram</a>
+      <a id="link-threads" href="#" target="_blank">Threads</a>
+      <a id="link-tiktok" href="#" target="_blank">TikTok</a>
+      <a id="link-yt" href="#" target="_blank">YouTube</a>
+      <span id="display-mail" style="display: none;"></span>
+    </div>
+    
+    <div id="welcome-msg" class="welcome-text"></div>
+  </header>
+
+  <h2 class="section-title">🌱 ĐỒ LÉP CHỌN...</h2>
+
+  <div class="category-container">
+    <div class="category-filter">
+      <button class="cat-btn active" onclick="filterProducts('all', this)">Tất cả</button>
+      <button class="cat-btn" onclick="filterProducts('mĩ phẩm', this)">Mĩ phẩm</button>
+      <button class="cat-btn" onclick="filterProducts('quần áo', this)">Quần áo</button>
+      <button class="cat-btn" onclick="filterProducts('decor', this)">Decor</button>
+      <button class="cat-btn" onclick="filterProducts('sách', this)">Sách</button>
+      <button class="cat-btn" onclick="filterProducts('dụng cụ học tập', this)">Học tập</button>
+    </div>
   </div>
-  
-  <h1 id="display-name">Lép là Leaf 🌱</h1>
-  
-  <p id="display-bio">Đang tải tiểu sử...</p>
-  <div id="display-status" class="status-bubble"></div>
 
-  <div class="social-links">
-    <a id="link-fb" href="#" target="_blank">Facebook</a>
-    <a id="link-ig" href="#" target="_blank">Instagram</a>
-    <a id="link-threads" href="#" target="_blank">Threads</a>
-    <a id="link-tiktok" href="#" target="_blank">TikTok</a>
-    <a id="link-yt" href="#" target="_blank">YouTube</a>
-    <span id="display-mail" style="margin-left: 10px; font-size: 0.9em; color: #666; display: none;"></span>
+  <div id="shop" class="grid"></div>
+
+  <div class="lep-wrap">
+    <img src="lep-idle.webp" class="lep-base">
+    <img src="lep-blink.webp" class="lep-blink">
   </div>
-  
-  <div id="welcome-msg" class="welcome-text"></div>
-</header>
-<h1>🌱 LÉP ĐÂY...</h1>
 
-<div id="shop" class="grid"></div>
-
-<!-- mascot -->
-<div class="lep-wrap">
-  <img src="lep-idle.webp" class="lep-base">
-  <img src="lep-blink.webp" class="lep-blink">
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
 </body>
 </html>

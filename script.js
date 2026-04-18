@@ -3,9 +3,15 @@ const supabaseClient = window.supabase.createClient(
   "sb_publishable_DhXag1beuBobuA8n4580Eg_hPUZJ9P0"
 );
 
-const shop = document.getElementById("shop");
+let allProducts = [];
 
-// 1. Hàm khởi tạo giao diện Profile, Social và Gmail (Dán đè phần này vào initShopeeMini của m)
+// 1. Hàm khởi tạo chính
+async function init() {
+    await initShopeeMini(); // Load thông tin cá nhân Lép
+    await loadProducts();   // Load danh sách sản phẩm
+}
+
+// 2. Hàm Load Profile, Social và Gmail
 async function initShopeeMini() {
   const { data: settings, error } = await supabaseClient.from("Settings").select("*");
   if (error || !settings) return;
@@ -17,7 +23,7 @@ async function initShopeeMini() {
   if (config.bio) document.getElementById("display-bio").innerText = config.bio;
   if (config.status) document.getElementById("display-status").innerText = `💬 Lép nói: ${config.status}`;
 
-  // Đổ Link mạng xã hội (Facebook, TikTok, Threads...)
+  // Đổ Link mạng xã hội
   const platforms = ['fb', 'ig', 'threads', 'tiktok', 'yt'];
   platforms.forEach(p => {
     const link = config[p + '_link'];
@@ -32,7 +38,7 @@ async function initShopeeMini() {
     }
   });
 
-  // Xử lý hiện Gmail dạng chữ (Không cần click)
+  // Hiển thị Gmail dạng chữ
   if (config.mail_link) {
     const mailEl = document.getElementById('display-mail');
     if (mailEl) {
@@ -42,7 +48,7 @@ async function initShopeeMini() {
     }
   }
 
-  // Nhận diện khách quen
+  // Nhận diện khách quen từ localStorage
   const history = JSON.parse(localStorage.getItem("viewed")) || [];
   if (history.length > 0) {
     const lastItem = history[history.length - 1].name;
@@ -51,45 +57,64 @@ async function initShopeeMini() {
   }
 }
 
-// 2. Hàm lấy danh sách sản phẩm (M bị thiếu đoạn này)
+// 3. Hàm lấy danh sách sản phẩm từ Supabase
 async function loadProducts() {
-  const { data, error } = await supabaseClient.from("Products").select("*");
-  if (error) {
-    console.error("Lỗi load sản phẩm:", error);
-    return;
-  }
-
-  shop.innerHTML = data.map(p => `
-    <div class="card" onclick="handleInteraction('${p.id}', '${p.name}')">
-      <img src="${p.image}">
-      <h4>${p.name}</h4>
-      <p>${p.desc}</p>
-      <a href="${p.link}" target="_blank" onclick="event.stopPropagation(); buyNow('${p.id}', '${p.name}')">Mua ngay</a>
-    </div>
-  `).join("");
+    const { data, error } = await supabaseClient.from("Products").select("*");
+    if (error) return;
+    allProducts = data;
+    renderProducts(allProducts);
 }
 
-// 3. Hàm xử lý khi khách xem sản phẩm (M bị thiếu đoạn này)
+// 4. Hàm hiển thị sản phẩm ra HTML
+function renderProducts(products) {
+    const shop = document.getElementById("shop");
+    if (products.length === 0) {
+        shop.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #999; padding: 20px;'>Lép chưa có đồ loại này m ơi...</p>";
+        return;
+    }
+    shop.innerHTML = products.map(p => `
+        <div class="card" onclick="handleInteraction('${p.id}', '${p.name}')">
+            <img src="${p.image}">
+            <h4>${p.name}</h4>
+            <p>${p.desc}</p>
+            <a href="${p.link}" target="_blank" onclick="event.stopPropagation(); buyNow('${p.id}', '${p.name}')">Mua ngay</a>
+        </div>
+    `).join("");
+}
+
+// 5. Hàm lọc sản phẩm theo danh mục
+function filterProducts(category, btn) {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (category === 'all') {
+        renderProducts(allProducts);
+    } else {
+        const filtered = allProducts.filter(p => p.category === category);
+        renderProducts(filtered);
+    }
+}
+
+// 6. Hàm xử lý khi khách click xem sản phẩm
 async function handleInteraction(id, name) {
-  // Tăng lượt click trên DB để thống kê cho m
-  await supabaseClient.rpc('increment_click', { row_id: id });
+    // Tăng lượt click trên DB (RPC)
+    await supabaseClient.rpc('increment_click', { row_id: id });
 
-  // Lưu lịch sử xem vào máy khách để làm lời chào cá nhân hoá
-  let history = JSON.parse(localStorage.getItem("viewed")) || [];
-  history.push({id, name, time: Date.now()});
-  localStorage.setItem("viewed", JSON.stringify(history.slice(-10)));
-  
-  const welcomeMsg = document.getElementById("welcome-msg");
-  if(welcomeMsg) welcomeMsg.innerHTML = `Vừa xem <b>${name}</b> xong đúng không? Mua đi!`;
+    // Lưu vào lịch sử máy khách
+    let history = JSON.parse(localStorage.getItem("viewed")) || [];
+    history.push({id, name, time: Date.now()});
+    localStorage.setItem("viewed", JSON.stringify(history.slice(-10)));
+    
+    const welcomeMsg = document.getElementById("welcome-msg");
+    if(welcomeMsg) welcomeMsg.innerHTML = `Vừa xem <b>${name}</b> xong đúng không? Mua đi!`;
 }
 
-// 4. Hàm xử lý khi bấm nút "Mua ngay"
+// 7. Hàm khi bấm nút Mua ngay
 function buyNow(id, name) {
-  let bought = JSON.parse(localStorage.getItem("bought")) || [];
-  bought.push({id, name, time: Date.now()});
-  localStorage.setItem("bought", JSON.stringify(bought));
+    let bought = JSON.parse(localStorage.getItem("bought")) || [];
+    bought.push({id, name, time: Date.now()});
+    localStorage.setItem("bought", JSON.stringify(bought));
 }
 
-// --- GỌI HÀM ĐỂ WEB CHẠY ---
-initShopeeMini();
-loadProducts();
+// CHẠY HÀM KHỞI TẠO
+init();
