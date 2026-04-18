@@ -1,22 +1,28 @@
-/* Reset cơ bản để không bị nhảy cỡ chữ */
+/* --- 1. CÀI ĐẶT CHUNG --- */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* Xóa vệt đen khi chạm trên điện thoại */
 }
 
 body {
-    background-color: #f9f9f9; /* Màu nền nhạt cho sang */
+    background-color: #f4f7f6; /* Nền xám nhạt cho nổi bật Card */
     color: #333;
     line-height: 1.6;
-    /* KHÓA CHIỀU RỘNG: Đây là chỗ giúp web không bị to oạch trên máy tính */
-    max-width: 480px; 
+    max-width: 480px; /* Chuẩn giao diện Bio Link */
     margin: 0 auto; 
     padding: 20px;
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    padding-bottom: 120px; /* Chừa chỗ cho con Lép */
 }
 
-/* Ảnh đại diện cho nhỏ lại và tròn trịa */
+/* --- 2. PROFILE & SOCIAL NÉT CĂNG --- */
+.profile-section {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
 .avatar-img {
     width: 100px;
     height: 100px;
@@ -24,12 +30,12 @@ body {
     object-fit: cover;
     border: 3px solid #5ed3c6;
     margin-bottom: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* Các nút mạng xã hội nhìn như nút bấm thật */
 .social-links a {
     display: inline-block;
-    padding: 8px 15px;
+    padding: 8px 16px;
     margin: 5px;
     background: #fff;
     border: 1px solid #5ed3c6;
@@ -37,7 +43,8 @@ body {
     text-decoration: none;
     color: #5ed3c6;
     font-size: 14px;
-    transition: 0.3s;
+    font-weight: 600;
+    transition: 0.3s ease;
 }
 
 .social-links a:hover {
@@ -45,62 +52,91 @@ body {
     color: #fff;
 }
 
-/* Danh sách sản phẩm chia 2 cột cho đẹp */
+/* --- 3. GIỎ HÀNG SẢN PHẨM --- */
 .grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Chia đôi màn hình */
+    grid-template-columns: 1fr 1fr; /* Chia 2 cột đều tăm tắp */
     gap: 15px;
     margin-top: 20px;
 }
 
 .card {
     background: #fff;
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     text-align: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .card img {
     width: 100%;
     border-radius: 8px;
-    aspect-ratio: 1/1; /* Ép ảnh thành hình vuông cho đều */
+    aspect-ratio: 1/1;
     object-fit: cover;
+    margin-bottom: 10px;
 }
-/* --- PHẦN FIX CON LÉP TO --- */
 
-/* Khung bọc mascot */
+.card h4 {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.card p {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin-bottom: 10px;
+    flex-grow: 1; /* Đẩy nút xuống đáy nếu mô tả ngắn */
+}
+
+/* --- 4. NÚT MUA NGAY (XỊN XÒ) --- */
+.card a {
+    display: block;
+    background: linear-gradient(135deg, #5ed3c6 0%, #48b4a9 100%);
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.85rem;
+    padding: 10px 0;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(94, 211, 198, 0.4);
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card a:active {
+    transform: scale(0.95); /* Hiệu ứng nhấn nút lún xuống */
+    box-shadow: 0 2px 6px rgba(94, 211, 198, 0.2);
+}
+
+/* --- 5. CON LÉP NHỎ GỌN NHÁY MẮT --- */
 .lep-wrap {
-    position: fixed;    /* Luôn đứng yên một chỗ khi cuộn trang */
-    bottom: 20px;       /* Cách đáy 20px */
-    right: 20px;        /* Cách phải 20px */
-    width: 80px;        /* Độ rộng con Lép (M có thể chỉnh 70-100 tùy ý) */
-    height: 80px;       /* Chiều cao tương ứng */
-    z-index: 9999;      /* Nổi lên trên cùng tất cả các thành phần */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 75px; 
+    height: 75px;
+    z-index: 9999;
 }
 
-/* Ảnh base và ảnh nháy mắt */
 .lep-base, 
 .lep-blink {
     width: 100%;
     height: 100%;
-    position: absolute; /* Chồng hai ảnh lên nhau */
+    position: absolute;
     top: 0;
     left: 0;
     object-fit: contain;
 }
 
-/* Hiệu ứng nháy mắt (Cái này nếu m chưa có trong file cũ thì dán vào luôn) */
 .lep-blink {
     animation: blink-anim 3s steps(1) infinite;
 }
 
 @keyframes blink-anim {
-    0%, 90% { opacity: 0; } /* Ẩn ảnh nháy mắt hầu hết thời gian */
-    91%, 100% { opacity: 1; } /* Hiện ra chớp nhoáng rồi lại ẩn */
-}
-
-/* Thêm khoảng trống ở đáy body để không bị mascot che mất sản phẩm cuối cùng */
-body {
-    padding-bottom: 100px;
+    0%, 90% { opacity: 0; }
+    91%, 100% { opacity: 1; }
 }
