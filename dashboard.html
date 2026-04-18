@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin - Lép là Leaf</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; background: #f4f4f4; }
+    section { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    input, textarea { width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; }
+    button { background: #5ed3c6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<h2>Hệ thống quản lý Lép 🌱</h2>
+
+<section>
+  <h3>Cập nhật giao diện</h3>
+  <input id="new-avatar" placeholder="Link ảnh đại diện mới">
+  <textarea id="new-status" placeholder="Cảm nghĩ hôm nay của Lép..."></textarea>
+  <button onclick="saveSettings()">Lưu giao diện</button>
+</section>
+
+<section>
+  <h3>🔥 Top 5 sản phẩm Hot</h3>
+  <div id="stats-list">Đang tải thống kê...</div>
+</section>
+
+<section>
+  <h3>Đăng sản phẩm mới</h3>
+  <input id="name" placeholder="Tên sản phẩm">
+  <input id="desc" placeholder="Mô tả ngắn">
+  <input type="file" id="file">
+  <input id="link" placeholder="Link mua hàng (Shopee/Lazada)">
+  <button onclick="addProduct()">Đăng bán</button>
+</section>
+
+<div id="list"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabaseClient = supabase.createClient(
+  "https://ebraxafpawypwmntoglw.supabase.co",
+  "sb_publishable_DhXag1beuBobuA8n4580Eg_hPUZJ9P0"
+);
+
+// Lưu Settings
+async function saveSettings() {
+  const avatar = document.getElementById("new-avatar").value;
+  const status = document.getElementById("new-status").value;
+  if(avatar) await supabaseClient.from("Settings").upsert({ key: "avatar", value: avatar });
+  if(status) await supabaseClient.from("Settings").upsert({ key: "status", value: status });
+  alert("Xong m nhé!");
+}
+
+// Xem thống kê
+async function loadStats() {
+  const { data } = await supabaseClient.from("Products").select("name, click_count").order('click_count', { ascending: false }).limit(5);
+  document.getElementById("stats-list").innerHTML = data ? data.map(p => `<p><b>${p.name}</b>: ${p.click_count || 0} click</p>`).join("") : "Chưa có dữ liệu";
+}
+
+// Đăng sản phẩm
+async function addProduct(){
+  const name = document.getElementById("name").value;
+  const desc = document.getElementById("desc").value;
+  const link = document.getElementById("link").value;
+  const file = document.getElementById("file").files[0];
+
+  if(!file) return alert("Chọn ảnh đi m!");
+  const fileName = Date.now() + "_" + file.name;
+  await supabaseClient.storage.from("images").upload(fileName, file);
+  const { data: { publicUrl } } = supabaseClient.storage.from("images").getPublicUrl(fileName);
+
+  await supabaseClient.from("Products").insert([{ name, desc, image: publicUrl, link }]);
+  alert("Đăng thành công!");
+  location.reload();
+}
+
+// Load danh sách xoá
+async function loadList() {
+  const { data } = await supabaseClient.from("Products").select("*");
+  document.getElementById("list").innerHTML = data.map(p => `
+    <div style="border-bottom: 1px solid #ccc; padding: 10px;">
+      <b>${p.name}</b> <button onclick="deleteP('${p.id}')">Xoá</button>
+    </div>
+  `).join("");
+}
+
+async function deleteP(id) {
+  if(confirm("Xoá thật à?")) {
+    await supabaseClient.from("Products").delete().eq("id", id);
+    location.reload();
+  }
+}
+
+loadStats();
+loadList();
+</script>
+</body>
+</html>
