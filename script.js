@@ -5,59 +5,60 @@ const supabaseClient = window.supabase.createClient(
 
 let allProducts = [];
 
-// 1. Hàm khởi tạo chính
 async function init() {
-    await initShopeeMini(); // Load thông tin cá nhân Lép
-    await loadProducts();   // Load danh sách sản phẩm
+    await initShopeeMini(); 
+    await loadProducts();   
 }
 
-// 2. Hàm Load Profile, Social và Gmail
 async function initShopeeMini() {
   const { data: settings, error } = await supabaseClient.from("Settings").select("*");
   if (error || !settings) return;
 
   const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
 
-  // Đổ Avatar, Bio, Status
   if (config.avatar) document.getElementById("display-avatar").src = config.avatar;
   if (config.bio) document.getElementById("display-bio").innerText = config.bio;
   if (config.status) document.getElementById("display-status").innerText = `💬 Lép nói: ${config.status}`;
 
-  // Đổ Link mạng xã hội
-  const platforms = ['fb', 'ig', 'threads', 'tiktok', 'yt'];
-  platforms.forEach(p => {
+  // Đổ Social Links (Giữ nguyên logic của m)
+  ['fb', 'ig', 'threads', 'tiktok', 'yt'].forEach(p => {
     const link = config[p + '_link'];
     const el = document.getElementById('link-' + p);
-    if (el) {
-      if (link) {
-        el.href = link;
-        el.style.display = 'inline-block';
-      } else {
-        el.style.display = 'none';
-      }
-    }
+    if (el) { el.href = link || '#'; el.style.display = link ? 'inline-block' : 'none'; }
   });
 
-  // Hiển thị Gmail dạng chữ
-  if (config.mail_link) {
-    const mailEl = document.getElementById('display-mail');
-    if (mailEl) {
-      const cleanMail = config.mail_link.replace('mailto:', '');
-      mailEl.innerText = `📧 Contact: ${cleanMail}`;
-      mailEl.style.display = 'inline-block';
-    }
-  }
-
-  // Nhận diện khách quen từ localStorage
+  // --- LOGIC PHÂN LOẠI KHÁCH HÀNG ---
+  const welcomeEl = document.getElementById("welcome-msg");
   const history = JSON.parse(localStorage.getItem("viewed")) || [];
-  if (history.length > 0) {
-    const lastItem = history[history.length - 1].name;
-    const welcomeEl = document.getElementById("welcome-msg");
-    if (welcomeEl) welcomeEl.innerHTML = `Chào m quay lại! Vẫn đang tia cái <b>${lastItem}</b> à?`;
+  const visitCount = parseInt(localStorage.getItem("visit_count") || "0");
+  
+  // Tăng số lần vào web
+  localStorage.setItem("visit_count", visitCount + 1);
+
+  if (visitCount === 0 && history.length === 0) {
+    // 1. Khách mới tinh
+    welcomeEl.innerHTML = "Chào m! Lần đầu ghé tiệm Lép à? Xem đồ đi, không mua t khinh.";
+  } else {
+    // 2. Khách cũ - Tìm sở thích (Danh mục xem nhiều nhất)
+    const categories = history.map(h => h.category).filter(Boolean);
+    let favoriteCat = "";
+    if (categories.length > 0) {
+      favoriteCat = categories.reduce((a, b, i, arr) => 
+        (arr.filter(v => v === a).length >= arr.filter(v => v === b).length ? a : b)
+      );
+    }
+
+    if (favoriteCat) {
+      welcomeEl.innerHTML = `Quay lại rồi à? Nhìn m là biết vẫn đang mê mấy món <b>${favoriteCat}</b> rồi!`;
+    } else if (history.length > 0) {
+      const lastItem = history[history.length - 1].name;
+      welcomeEl.innerHTML = `Vẫn đang tia cái <b>${lastItem}</b> à? Mua lẹ đi cho t nhờ!`;
+    } else {
+      welcomeEl.innerHTML = "Lại là m à? Lần này định mua thật hay lại vào ngó rồi đi ra?";
+    }
   }
 }
 
-// 3. Hàm lấy danh sách sản phẩm từ Supabase
 async function loadProducts() {
     const { data, error } = await supabaseClient.from("Products").select("*");
     if (error) return;
@@ -65,7 +66,6 @@ async function loadProducts() {
     renderProducts(allProducts);
 }
 
-// 4. Hàm hiển thị sản phẩm ra HTML
 function renderProducts(products) {
     const shop = document.getElementById("shop");
     if (products.length === 0) {
@@ -73,7 +73,7 @@ function renderProducts(products) {
         return;
     }
     shop.innerHTML = products.map(p => `
-        <div class="card" onclick="handleInteraction('${p.id}', '${p.name}')">
+        <div class="card" onclick="handleInteraction('${p.id}', '${p.name}', '${p.category}')">
             <img src="${p.image}">
             <h4>${p.name}</h4>
             <p>${p.desc}</p>
@@ -82,39 +82,28 @@ function renderProducts(products) {
     `).join("");
 }
 
-// 5. Hàm lọc sản phẩm theo danh mục
 function filterProducts(category, btn) {
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
-    if (category === 'all') {
-        renderProducts(allProducts);
-    } else {
-        const filtered = allProducts.filter(p => p.category === category);
-        renderProducts(filtered);
-    }
+    renderProducts(category === 'all' ? allProducts : allProducts.filter(p => p.category === category));
 }
 
-// 6. Hàm xử lý khi khách click xem sản phẩm
-async function handleInteraction(id, name) {
-    // Tăng lượt click trên DB (RPC)
+async function handleInteraction(id, name, category) {
     await supabaseClient.rpc('increment_click', { row_id: id });
 
-    // Lưu vào lịch sử máy khách
     let history = JSON.parse(localStorage.getItem("viewed")) || [];
-    history.push({id, name, time: Date.now()});
-    localStorage.setItem("viewed", JSON.stringify(history.slice(-10)));
+    // Lưu cả category để sau này đoán sở thích
+    history.push({id, name, category, time: Date.now()});
+    localStorage.setItem("viewed", JSON.stringify(history.slice(-15))); // Lưu 15 món gần nhất
     
     const welcomeMsg = document.getElementById("welcome-msg");
-    if(welcomeMsg) welcomeMsg.innerHTML = `Vừa xem <b>${name}</b> xong đúng không? Mua đi!`;
+    if(welcomeMsg) welcomeMsg.innerHTML = `Thích món <b>${name}</b> này rồi chứ gì? Mua đi!`;
 }
 
-// 7. Hàm khi bấm nút Mua ngay
 function buyNow(id, name) {
     let bought = JSON.parse(localStorage.getItem("bought")) || [];
     bought.push({id, name, time: Date.now()});
     localStorage.setItem("bought", JSON.stringify(bought));
 }
 
-// CHẠY HÀM KHỞI TẠO
 init();
