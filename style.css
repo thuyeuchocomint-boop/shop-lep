@@ -152,34 +152,30 @@ body {
     scrollbar-color: #5ed3c6 #f0f0f0;
 }
 
-
-
-/* Khung bọc ngoài cùng */
+/* Container bọc ngoài - Phải có cái này để giới hạn hàng */
 .category-container {
     width: 100%;
-    display: flex;
     overflow-x: auto; /* Cho phép cuộn ngang */
-    gap: 12px;        /* TẠO KHOẢNG CÁCH GIỮA CÁC NÚT - KHÔNG BỊ DÍNH */
-    padding: 15px 5px;
-    margin-bottom: 10px;
-    -webkit-overflow-scrolling: touch; /* Vuốt cực mượt trên điện thoại */
-    scrollbar-width: thin; /* Hiện thanh cuộn mỏng cho máy tính */
+    overflow-y: hidden; /* Chặn tuyệt đối việc nhảy xuống dòng 2 */
+    display: block;   /* Chuyển về block để quản lý luồng tốt hơn */
+    padding: 10px 0;
+    margin-bottom: 15px;
+    -webkit-overflow-scrolling: touch; 
 }
 
-/* Làm thanh cuộn đẹp hơn trên Chrome/Edge để dùng chuột kéo được */
-.category-container::-webkit-scrollbar {
-    height: 4px;
-}
-.category-container::-webkit-scrollbar-thumb {
-    background: #5ed3c6;
-    border-radius: 10px;
+/* Thẻ chứa các nút bấm */
+.category-filter {
+    display: flex;       /* Xếp các nút nằm ngang */
+    flex-wrap: nowrap;   /* KHÔNG CHO PHÉP XUỐNG DÒNG */
+    gap: 12px;           /* Khoảng cách giữa các nút */
+    padding-bottom: 5px; /* Chừa chỗ cho thanh cuộn mảnh */
 }
 
-/* Định dạng từng nút bấm danh mục */
+/* Định dạng nút bấm */
 .cat-btn {
-    flex-shrink: 0;      /* QUAN TRỌNG: Không cho nút bị bóp méo hay dính nhau */
-    white-space: nowrap; /* Không cho chữ bị xuống dòng */
-    padding: 8px 18px;
+    flex: 0 0 auto;      /* KHÔNG CHO CO LẠI, giữ nguyên kích thước */
+    white-space: nowrap; /* Ép chữ nằm trên 1 hàng */
+    padding: 8px 20px;
     border-radius: 20px;
     border: 1.5px solid #5ed3c6;
     background: #fff;
@@ -187,12 +183,20 @@ body {
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s;
 }
 
-/* Khi nút được bấm vào (Active) */
+/* Màu khi nút được chọn */
 .cat-btn.active {
     background: #5ed3c6;
     color: #fff;
-    box-shadow: 0 4px 10px rgba(94, 211, 198, 0.3);
+}
+
+/* Làm thanh cuộn mảnh trên máy tính để khách biết đường mà kéo */
+.category-container::-webkit-scrollbar {
+    height: 4px;
+}
+.category-container::-webkit-scrollbar-thumb {
+    background: #5ed3c6;
+    border-radius: 10px;
 }
