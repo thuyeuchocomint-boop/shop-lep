@@ -1,237 +1,201 @@
-/* --- 1. CÀI ĐẶT CHUNG --- */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent; /* Xóa vệt đen khi chạm trên điện thoại */
-}
-
+/* --- TỔNG QUAN --- */
 body {
-    background-color: #f4f7f6; /* Nền xám nhạt cho nổi bật Card */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0 10px 120px 10px; /* Thêm padding-bottom để không bị con Lép che */
     color: #333;
-    line-height: 1.6;
-    max-width: 480px; /* Chuẩn giao diện Bio Link */
-    margin: 0 auto; 
-    padding: 20px;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    padding-bottom: 120px; /* Chừa chỗ cho con Lép */
+    max-width: 600px;
+    margin: auto;
+    
+    /* BACKGROUND MÀU LOANG (GRADIENT) NHẸ NHÀNG */
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    background-attachment: fixed; /* Giữ background cố định khi cuộn */
+    min-height: 100vh; /* Đảm bảo background phủ hết chiều cao */
 }
 
-/* --- 2. PROFILE & SOCIAL NÉT CĂNG --- */
+a { text-decoration: none; color: inherit; }
+
+/* --- PROFILE SECTION --- */
 .profile-section {
     text-align: center;
-    margin-bottom: 25px;
+    padding: 30px 15px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.avatar-wrap {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    padding: 3px;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
 }
 
 .avatar-img {
-    width: 100px;
-    height: 100px;
+    width: 100%; height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #5ed3c6;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.social-links a {
-    display: inline-block;
-    padding: 8px 16px;
-    margin: 5px;
-    background: #fff;
-    border: 1px solid #5ed3c6;
-    border-radius: 20px;
-    text-decoration: none;
-    color: #5ed3c6;
-    font-size: 14px;
-    font-weight: 600;
-    transition: 0.3s ease;
-}
+#display-name { font-size: 1.3rem; margin: 10px 0 5px; color: #2c3e50; }
+#display-bio { font-size: 0.9rem; color: #7f8c8d; margin-top: 0; padding: 0 20px; }
 
-.social-links a:hover {
-    background: #5ed3c6;
-    color: #fff;
-}
-
-/* --- 3. GIỎ HÀNG SẢN PHẨM --- */
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Chia 2 cột đều tăm tắp */
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.card {
-    background: #fff;
-    border-radius: 12px;
-    padding: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-}
-
-.card img {
-    width: 100%;
-    border-radius: 8px;
-    aspect-ratio: 1/1;
-    object-fit: cover;
-    margin-bottom: 10px;
-}
-
-.card h4 {
-    font-size: 0.9rem;
-    margin-bottom: 5px;
-    color: #2c3e50;
-}
-
-.card p {
-    font-size: 0.8rem;
-    color: #7f8c8d;
-    margin-bottom: 10px;
-    flex-grow: 1; /* Đẩy nút xuống đáy nếu mô tả ngắn */
-}
-
-/* --- 4. NÚT MUA NGAY (XỊN XÒ) --- */
-.card a {
-    display: block;
-    background: linear-gradient(135deg, #5ed3c6 0%, #48b4a9 100%);
-    color: #fff;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 0.85rem;
-    padding: 10px 0;
-    border-radius: 25px;
-    box-shadow: 0 4px 12px rgba(94, 211, 198, 0.4);
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.card a:active {
-    transform: scale(0.95); /* Hiệu ứng nhấn nút lún xuống */
-    box-shadow: 0 2px 6px rgba(94, 211, 198, 0.2);
-}
-
-/* --- 5. CON LÉP NHỎ GỌN NHÁY MẮT --- */
-.lep-wrap {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 75px; 
-    height: 75px;
-    z-index: 9999;
-}
-
-.lep-base, 
-.lep-blink {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    object-fit: contain;
-}
-
-.lep-blink {
-    animation: blink-anim 3s steps(1) infinite;
-}
-
-@keyframes blink-anim {
-    0%, 90% { opacity: 0; }
-    91%, 100% { opacity: 1; }
-}
-
-/* Thanh danh mục */
-.category-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    overflow-x: auto; /* Cho phép cuộn */
-    padding: 10px 0;
-    scrollbar-width: thin; /* Thanh cuộn mảnh cho Firefox */
-    scrollbar-color: #5ed3c6 #f0f0f0;
-}
-
-/* Container bọc ngoài - Phải có cái này để giới hạn hàng */
-.category-container {
-    width: 100%;
-    overflow-x: auto; /* Cho phép cuộn ngang */
-    overflow-y: hidden; /* Chặn tuyệt đối việc nhảy xuống dòng 2 */
-    display: block;   /* Chuyển về block để quản lý luồng tốt hơn */
-    padding: 10px 0;
-    margin-bottom: 15px;
-    -webkit-overflow-scrolling: touch; 
-}
-
-/* Thẻ chứa các nút bấm */
-.category-filter {
-    display: flex;       /* Xếp các nút nằm ngang */
-    flex-wrap: nowrap;   /* KHÔNG CHO PHÉP XUỐNG DÒNG */
-    gap: 12px;           /* Khoảng cách giữa các nút */
-    padding-bottom: 5px; /* Chừa chỗ cho thanh cuộn mảnh */
-}
-
-/* Định dạng nút bấm */
-.cat-btn {
-    flex: 0 0 auto;      /* KHÔNG CHO CO LẠI, giữ nguyên kích thước */
-    white-space: nowrap; /* Ép chữ nằm trên 1 hàng */
-    padding: 8px 20px;
-    border-radius: 20px;
-    border: 1.5px solid #5ed3c6;
-    background: #fff;
-    color: #5ed3c6;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-/* Màu khi nút được chọn */
-.cat-btn.active {
-    background: #5ed3c6;
-    color: #fff;
-}
-
-/* Làm thanh cuộn mảnh trên máy tính để khách biết đường mà kéo */
-.category-container::-webkit-scrollbar {
-    height: 4px;
-}
-.category-container::-webkit-scrollbar-thumb {
-    background: #5ed3c6;
-    border-radius: 10px;
-}
-body {
-    /* Màu loang nhẹ nhàng, không bị chói */
-    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-    min-height: 100vh;
-}
-
-/* Tin tức mới */
+/* TIN TỨC MỚI (NEWS FLASH) */
 .news-flash {
-    background: #fff3cd;
+    background: rgba(255, 202, 40, 0.15); /* Màu vàng nhạt trong suốt */
     border-left: 4px solid #ffca28;
-    padding: 10px;
+    color: #856404;
+    padding: 10px 15px;
     margin: 15px 0;
     border-radius: 8px;
     font-size: 0.9rem;
     font-weight: 500;
-    color: #856404;
+    text-align: left;
 }
 
-/* Card sản phẩm đẹp hơn trên Laptop */
-@media (min-width: 768px) {
-    body { max-width: 900px; }
-    .grid { grid-template-columns: 1fr 1fr 1fr; } /* Hiện 3 cột trên máy tính */
-}
+/* GMAIL CÁ NHÂN */
 .mail-link {
-    display: block;
+    display: inline-block;
+    color: #7f8c8d;
+    font-size: 0.85rem;
     margin-top: 10px;
-    color: #666;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
+    background: rgba(255,255,255,0.7);
+    padding: 5px 12px;
+    border-radius: 15px;
+    transition: 0.3s;
 }
 
 .mail-link:hover {
-    color: #5ed3c6; /* Màu xanh thương hiệu của Lép */
+    color: #5ed3c6;
+    background: white;
+    transform: translateY(-2px);
+}
+
+/* SOCIAL LINKS */
+.social-links {
+    display: flex; gap: 8px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.social-links a {
+    width: 35px; height: 35px;
+    background: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: 0.3s ease-out;
+    font-size: 0; /* Ẩn chữ đi m ơi */
+}
+
+/* M thêm icon vào sau, giờ tao để chữ ẩn đi cho gọn */
+.social-links a:hover { transform: scale(1.1) translateY(-3px); }
+
+/* TIN TỨC VÀ WELCOME */
+.status-bubble {
+    background: white; color: #333;
+    padding: 10px 20px;
+    border-radius: 20px 20px 20px 5px;
+    display: inline-block;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-bottom: 10px;
+}
+
+.welcome-text {
+    font-size: 0.85rem; color: #95a5a6;
+    margin-bottom: 25px;
+}
+
+/* --- PRODUCT SECTION --- */
+.section-title { font-size: 1rem; color: #7f8c8d; text-align: center; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+
+/* GRID SẢN PHẨM MỚI (TỐI ƯU CẢ MOBILE & LAPTOP) */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Mặc định 2 cột trên điện thoại */
+    gap: 12px;
+}
+
+/* TRÊN LAPTOP THÌ HIỆN 3 CỘT */
+@media (min-width: 768px) {
+    body { max-width: 800px; }
+    .grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+.card {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(5px); /* Làm mờ nhẹ background sau card */
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+
+.card img {
+    width: 100%;
+    aspect-ratio: 1/1; /* Ảnh vuông cho đẹp m ơi */
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.card h4 { font-size: 0.85rem; margin: 0 0 5px 0; color: #2c3e50; line-height: 1.3; height: 32px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card p { font-size: 0.75rem; color: #7f8c8d; margin: 0 0 10px 0; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+
+.card a {
+    background: rgba(94, 211, 198, 0.1);
+    color: #00897b;
+    padding: 8px 0;
+    width: 100%;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.card a:hover {
+    background: #5ed3c6;
+    color: white;
+}
+
+/* --- CON LÉP ANIMATION (SỬA LỖI KHUNG ẢNH) --- */
+.lep-wrap {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    width: 130px;
+    margin: 0 auto;
+    z-index: 100;
+}
+
+.lep-base, .lep-blink {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+}
+
+.lep-base {
+    position: relative;
+    z-index: 1;
+}
+
+.lep-blink {
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 2;
+    opacity: 0; /* Ẩn cái nháy đi m ơi */
+    animation: blinkEye 4s infinite; /* Cho nó nháy mắt liên tục */
+}
+
+@keyframes blinkEye {
+    0%, 93%, 97%, 100% { opacity: 0; } /* Ẩn cái nháy */
+    95% { opacity: 1; } /* Hiện cái nháy lên trong 0.2 giây */
 }
