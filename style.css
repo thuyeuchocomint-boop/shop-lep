@@ -1,201 +1,206 @@
-/* --- TỔNG QUAN --- */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* --- 1. RESET & NỀN WEB (BACKGROUND) --- */
+* {
     margin: 0;
-    padding: 0 10px 120px 10px; /* Thêm padding-bottom để không bị con Lép che */
-    color: #333;
-    max-width: 600px;
-    margin: auto;
-    
-    /* BACKGROUND MÀU LOANG (GRADIENT) NHẸ NHÀNG */
-    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-    background-attachment: fixed; /* Giữ background cố định khi cuộn */
-    min-height: 100vh; /* Đảm bảo background phủ hết chiều cao */
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-a { text-decoration: none; color: inherit; }
+body {
+    /* Màu loang nhẹ nhàng m muốn đây */
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    background-attachment: fixed;
+    color: #333;
+    line-height: 1.6;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    
+    /* ÉP GIAO DIỆN VÀO GIỮA (FIX LỖI LAPTOP) */
+    max-width: 480px; 
+    margin: 0 auto; 
+    min-height: 100vh;
+    padding: 20px;
+    padding-bottom: 100px; /* Chừa chỗ cho con Lép */
+    box-shadow: 0 0 20px rgba(0,0,0,0.05); /* Tạo viền mờ cho đẹp trên Laptop */
+}
 
-/* --- PROFILE SECTION --- */
+/* --- 2. PROFILE SECTION --- */
 .profile-section {
     text-align: center;
-    padding: 30px 15px;
-    margin-bottom: 10px;
-    position: relative;
-}
-
-.avatar-wrap {
-    width: 90px; height: 90px;
-    border-radius: 50%;
-    margin: 0 auto 15px;
-    padding: 3px;
-    background: white;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    position: relative;
-}
-
-.avatar-img {
-    width: 100%; height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-#display-name { font-size: 1.3rem; margin: 10px 0 5px; color: #2c3e50; }
-#display-bio { font-size: 0.9rem; color: #7f8c8d; margin-top: 0; padding: 0 20px; }
-
-/* TIN TỨC MỚI (NEWS FLASH) */
-.news-flash {
-    background: rgba(255, 202, 40, 0.15); /* Màu vàng nhạt trong suốt */
-    border-left: 4px solid #ffca28;
-    color: #856404;
-    padding: 10px 15px;
-    margin: 15px 0;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-align: left;
-}
-
-/* GMAIL CÁ NHÂN */
-.mail-link {
-    display: inline-block;
-    color: #7f8c8d;
-    font-size: 0.85rem;
-    margin-top: 10px;
-    background: rgba(255,255,255,0.7);
-    padding: 5px 12px;
-    border-radius: 15px;
-    transition: 0.3s;
-}
-
-.mail-link:hover {
-    color: #5ed3c6;
-    background: white;
-    transform: translateY(-2px);
-}
-
-/* SOCIAL LINKS */
-.social-links {
-    display: flex; gap: 8px;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-.social-links a {
-    width: 35px; height: 35px;
-    background: white;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    transition: 0.3s ease-out;
-    font-size: 0; /* Ẩn chữ đi m ơi */
-}
-
-/* M thêm icon vào sau, giờ tao để chữ ẩn đi cho gọn */
-.social-links a:hover { transform: scale(1.1) translateY(-3px); }
-
-/* TIN TỨC VÀ WELCOME */
-.status-bubble {
-    background: white; color: #333;
-    padding: 10px 20px;
-    border-radius: 20px 20px 20px 5px;
-    display: inline-block;
-    font-size: 0.85rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    margin-bottom: 10px;
-}
-
-.welcome-text {
-    font-size: 0.85rem; color: #95a5a6;
     margin-bottom: 25px;
 }
 
-/* --- PRODUCT SECTION --- */
-.section-title { font-size: 1rem; color: #7f8c8d; text-align: center; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
-
-/* GRID SẢN PHẨM MỚI (TỐI ƯU CẢ MOBILE & LAPTOP) */
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Mặc định 2 cột trên điện thoại */
-    gap: 12px;
-}
-
-/* TRÊN LAPTOP THÌ HIỆN 3 CỘT */
-@media (min-width: 768px) {
-    body { max-width: 800px; }
-    .grid { grid-template-columns: 1fr 1fr 1fr; }
-}
-
-.card {
-    background: rgba(255,255,255,0.8);
-    backdrop-filter: blur(5px); /* Làm mờ nhẹ background sau card */
-    padding: 12px;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
-
-.card img {
-    width: 100%;
-    aspect-ratio: 1/1; /* Ảnh vuông cho đẹp m ơi */
+.avatar-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
     object-fit: cover;
-    border-radius: 8px;
+    border: 3px solid #5ed3c6;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+#display-name {
+    font-size: 1.4rem;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+#display-bio {
+    font-size: 0.9rem;
+    color: #7f8c8d;
     margin-bottom: 10px;
 }
 
-.card h4 { font-size: 0.85rem; margin: 0 0 5px 0; color: #2c3e50; line-height: 1.3; height: 32px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.card p { font-size: 0.75rem; color: #7f8c8d; margin: 0 0 10px 0; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-
-.card a {
-    background: rgba(94, 211, 198, 0.1);
-    color: #00897b;
-    padding: 8px 0;
-    width: 100%;
-    border-radius: 8px;
+/* LINK GMAIL */
+.mail-link {
     display: inline-block;
-    font-size: 0.8rem;
-    font-weight: 600;
-    transition: 0.2s;
+    font-size: 0.85rem;
+    color: #666;
+    background: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.card a:hover {
+/* THANH TIN TỨC (ANNOUNCEMENT) - FIX LỖI "HIHI" */
+.news-flash {
+    background: #fff9db;
+    border-left: 5px solid #ffec99;
+    color: #856404;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 15px 0;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* CÁC NÚT SOCIAL */
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.social-links a {
+    background: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #5ed3c6;
+    border: 1px solid #5ed3c6;
+    transition: 0.3s;
+}
+
+.social-links a:hover {
     background: #5ed3c6;
     color: white;
 }
 
-/* --- CON LÉP ANIMATION (SỬA LỖI KHUNG ẢNH) --- */
+/* BONG BÓNG CHAT CỦA LÉP */
+.status-bubble {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 15px 15px 15px 2px;
+    font-size: 0.85rem;
+    display: inline-block;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin-bottom: 10px;
+}
+
+/* --- 3. CATEGORY & GRID SẢN PHẨM --- */
+.category-container {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.category-container::-webkit-scrollbar { display: none; }
+
+.cat-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid #5ed3c6;
+    background: white;
+    color: #5ed3c6;
+    margin-right: 5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cat-btn.active {
+    background: #5ed3c6;
+    color: white;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Luôn chia 2 cột cho đều */
+    gap: 15px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    text-align: center;
+    transition: 0.3s;
+}
+
+.card img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+
+.card h4 { font-size: 0.85rem; margin-bottom: 5px; height: 35px; overflow: hidden; }
+
+.card a {
+    display: block;
+    background: #5ed3c6;
+    color: white;
+    padding: 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* --- 4. CON LÉP ANIMATION (FIX CHE ĐỒ) --- */
 .lep-wrap {
     position: fixed;
-    bottom: 0; left: 0; right: 0;
-    width: 130px;
-    margin: 0 auto;
-    z-index: 100;
+    bottom: 20px;
+    right: calc(50% - 220px); /* Bám theo mép phải khung 480px trên Laptop */
+    width: 80px;
+    height: 80px;
+    z-index: 9999;
+    pointer-events: none; /* Khách bấm xuyên qua con Lép được */
+}
+
+/* Trên Mobile thì cho nó sát lề phải */
+@media (max-width: 500px) {
+    .lep-wrap {
+        right: 10px;
+    }
 }
 
 .lep-base, .lep-blink {
     width: 100%;
-    height: auto;
-    display: block;
-    object-fit: contain;
-}
-
-.lep-base {
-    position: relative;
-    z-index: 1;
+    position: absolute;
+    top: 0; left: 0;
 }
 
 .lep-blink {
-    position: absolute;
-    top: 0; left: 0;
-    z-index: 2;
-    opacity: 0; /* Ẩn cái nháy đi m ơi */
-    animation: blinkEye 4s infinite; /* Cho nó nháy mắt liên tục */
+    animation: blink-anim 3s steps(1) infinite;
 }
 
-@keyframes blinkEye {
-    0%, 93%, 97%, 100% { opacity: 0; } /* Ẩn cái nháy */
-    95% { opacity: 1; } /* Hiện cái nháy lên trong 0.2 giây */
+@keyframes blink-anim {
+    0%, 90% { opacity: 0; }
+    91%, 100% { opacity: 1; }
 }
