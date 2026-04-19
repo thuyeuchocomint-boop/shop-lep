@@ -237,6 +237,39 @@ function finishQuiz() {
     document.getElementById("quizBox").style.display = "none";
     shopEl.scrollIntoView({ behavior: 'smooth' });
 }
+/* --- 1. CẬP NHẬT TRẠNG THÁI & MÀU SẮC --- */
+async function loadSettings() {
+    try {
+        const { data: settings, error } = await supabaseClient.from("Settings").select("*");
+        if (error) throw error;
+        const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
 
+        // 1. Cập nhật Status (Kiểu mầm cây)
+        const statusEl = document.getElementById("display-status");
+        if (statusEl && config.status) {
+            statusEl.innerText = `💬 Lép nói: ${config.status}`;
+        }
+
+        // 2. Logic đổi màu web theo Mood (Màu lưu trong key 'user_mood')
+        if (config.user_mood) {
+            applyMoodColor(config.user_mood);
+        }
+        
+        // ... (giữ nguyên đoạn load Social Links của m)
+    } catch (err) { console.error("Lỗi:", err); }
+}
+
+// Hàm đổi màu toàn cục
+function applyMoodColor(mood) {
+    const colors = {
+        'happy': '#22c55e', // Xanh lá tươi
+        'sad': '#3b82f6',   // Xanh dương trầm
+        'angry': '#ef4444', // Đỏ xéo sắc
+        'chill': '#84cc16'  // Xanh chanh
+    };
+    const selectedColor = colors[mood] || '#22c55e';
+    document.documentElement.style.setProperty('--main-color', selectedColor);
+    // M nhớ trong CSS thay vì viết màu cứng, hãy dùng: color: var(--main-color);
+}
 /* --- 6. KHỞI CHẠY --- */
 init();

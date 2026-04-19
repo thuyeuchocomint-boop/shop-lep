@@ -415,6 +415,31 @@ async function addOrUpdateProduct() {
     cancelEdit();
     loadData();
 }
+async function updateStatus() {
+    const content = document.getElementById("new-status").value;
+    const mood = document.getElementById("mood-select").value;
+
+    // Cập nhật lên Supabase (Bảng Settings)
+    const { error } = await supabaseClient.from("Settings").upsert([
+        { key: 'status', value: content },
+        { key: 'user_mood', value: mood }
+    ]);
+
+    if (!error) {
+        alert("Đã đăng! Ra trang chủ mà xem thành quả.");
+        location.reload();
+    }
+}
+<div class="admin-section">
+    <h3>Đăng Status cho Lép</h3>
+    <textarea id="new-status" placeholder="Hôm nay m thấy thế nào?"></textarea>
+    <select id="mood-select">
+        <option value="happy">Vui (Web xanh tươi)</option>
+        <option value="sad">Hơi buồn (Web trầm xuống)</option>
+        <option value="angry">Đang cọc (Web đỏ xéo sắc)</option>
+    </select>
+    <button onclick="updateStatus()">Lên sóng ngay</button>
+</div>
 <input id="p-img" placeholder="Link ảnh sản phẩm (URL)">
 </script>
 </body>
