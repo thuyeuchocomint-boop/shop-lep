@@ -1,37 +1,116 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Admin - Lép</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-    input, textarea { width: 100%; margin-bottom: 10px; padding: 10px; }
-    button { background: #5ed3c6; color: white; border: none; padding: 10px; cursor: pointer; width: 100%; }
-  </style>
+    <title>Dashboard của Lép 🌱</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 900px; margin: auto; background: #f4f4f4; }
+        section { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, textarea, select { width: 100%; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { background: #5ed3c6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .product-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .hot { color: red; font-weight: bold; }
+    </style>
 </head>
 <body>
-  <h2>Quản lý Lép 🌱</h2>
-  <section>
-    <input id="new-avatar" placeholder="Link ảnh đại diện">
-    <textarea id="new-bio" placeholder="Tiểu sử"></textarea>
-    <input id="new-status" placeholder="Cảm nghĩ hôm nay">
-    <input id="email_contact" placeholder="Gmail của m">
-    <button onclick="saveAll()">Lưu Profile</button>
-  </section>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const supabaseClient = supabase.createClient("https://ebraxafpawypwmntoglw.supabase.co", "sb_publishable_DhXag1beuBobuA8n4580Eg_hPUZJ9P0");
-    async function saveAll() {
-      const s = {
-        avatar: document.getElementById("new-avatar").value,
-        bio: document.getElementById("new-bio").value,
-        status: document.getElementById("new-status").value,
-        email: document.getElementById("email_contact").value
-      };
-      for (const [key, value] of Object.entries(s)) {
-        if(value) await supabaseClient.from("Settings").upsert({ key, value });
-      }
-      alert("Xong!");
-    }
-  </script>
+    <h2>🌱 Quản lý Tiệm của Lép</h2>
+
+    <section>
+        <h3>Cập nhật Profile & Link</h3>
+        <input id="set-avatar" placeholder="Link ảnh Avatar mới">
+        <textarea id="set-bio" placeholder="Tiểu sử (Mỏ xéo sắc hay gì viết vào đây...)"></textarea>
+        <input id="set-status" placeholder="Cảm nghĩ hôm nay của Lép">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <input id="set-fb" placeholder="Link Facebook">
+            <input id="set-tiktok" placeholder="Link TikTok">
+            <input id="set-ig" placeholder="Link Instagram">
+            <input id="set-mail" placeholder="Gmail liên hệ">
+        </div>
+        <button onclick="updateSettings()">Lưu thay đổi</button>
+    </section>
+
+    <section>
+        <h3>Đăng sản phẩm mới</h3>
+        <input id="p-name" placeholder="Tên sản phẩm">
+        <input id="p-desc" placeholder="Mô tả ngắn">
+        <input id="p-link" placeholder="Link Shopee/Affiliate">
+        <select id="p-cat">
+            <option value="mĩ phẩm">Mĩ phẩm</option>
+            <option value="quần áo">Quần áo</option>
+            <option value="decor">Decor</option>
+            <option value="sách">Sách</option>
+            <option value="dụng cụ học tập">Học tập</option>
+        </select>
+        <input type="file" id="p-file">
+        <button onclick="addProduct()">Đăng đồ</button>
+    </section>
+
+    <section>
+        <h3>Danh sách đồ (Thống kê độ HOT)</h3>
+        <div id="product-list">Đang tải...</div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseClient = supabase.createClient("https://ebraxafpawypwmntoglw.supabase.co", "sb_publishable_DhXag1beuBobuA8n4580Eg_hPUZJ9P0");
+
+        // Load dữ liệu cũ lên form
+        async function loadData() {
+            const { data: settings } = await supabaseClient.from("Settings").select("*");
+            const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
+            if(config.avatar) document.getElementById("set-avatar").value = config.avatar;
+            if(config.bio) document.getElementById("set-bio").value = config.bio;
+            
+            const { data: products } = await supabaseClient.from("Products").select("*").order('click_count', { ascending: false });
+            document.getElementById("product-list").innerHTML = products.map(p => `
+                <div class="product-item">
+                    <span><b>${p.name}</b> - <span class="hot">${p.click_count || 0} Click</span></span>
+                    <button style="background: #ff6b6b;" onclick="deleteProduct('${p.id}')">Xoá</button>
+                </div>
+            `).join("");
+        }
+
+        async function updateSettings() {
+            const s = {
+                avatar: document.getElementById("set-avatar").value,
+                bio: document.getElementById("set-bio").value,
+                status: document.getElementById("set-status").value,
+                fb_link: document.getElementById("set-fb").value,
+                tiktok_link: document.getElementById("set-tiktok").value,
+                email: document.getElementById("set-mail").value
+            };
+            for (const [key, value] of Object.entries(s)) {
+                if(value) await supabaseClient.from("Settings").upsert({ key, value });
+            }
+            alert("Lưu xong rồi m!");
+        }
+
+        async function addProduct() {
+            const file = document.getElementById("p-file").files[0];
+            if(!file) return alert("Thiếu ảnh m ơi!");
+            
+            const fileName = Date.now() + "_" + file.name;
+            await supabaseClient.storage.from("images").upload(fileName, file);
+            const { data: { publicUrl } } = supabaseClient.storage.from("images").getPublicUrl(fileName);
+
+            await supabaseClient.from("Products").insert([{
+                name: document.getElementById("p-name").value,
+                desc: document.getElementById("p-desc").value,
+                link: document.getElementById("p-link").value,
+                category: document.getElementById("p-cat").value,
+                image: publicUrl,
+                click_count: 0
+            }]);
+            alert("Đã thêm đồ!");
+            location.reload();
+        }
+
+        async function deleteProduct(id) {
+            if(confirm("Xoá thật à m?")) {
+                await supabaseClient.from("Products").delete().eq('id', id);
+                location.reload();
+            }
+        }
+        loadData();
+    </script>
 </body>
 </html>
