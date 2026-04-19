@@ -36,21 +36,19 @@
             return;
         }
 
-        // Hiện trạng thái đang kiểm tra
         btn.disabled = true;
         status.innerText = "Đang hỏi tội Database...";
 
         try {
-            // Lấy pass thực từ Database
+            // SỬA LỖI 406 TẠI ĐÂY: Dùng maybeSingle() để Supabase không bắt bẻ header
             const { data, error } = await supabaseAuth
                 .from('Settings')
                 .select('value')
                 .eq('key', 'admin_password')
-                .single();
+                .maybeSingle(); 
 
             if (error) throw error;
 
-            // Kiểm tra mật khẩu (Xử lý cả trường hợp thừa dấu cách)
             if (data && input.trim() === data.value.trim()) {
                 status.innerText = "Chuẩn rồi m ơi! Đang vào...";
                 setTimeout(() => {
@@ -61,13 +59,13 @@
                 window.location.href = "index.html";
             }
         } catch (err) {
-            console.error(err);
-            status.innerText = "Lỗi kết nối rồi m ơi, check lại mạng hoặc Supabase!";
+            console.error("Lỗi chi tiết:", err);
+            // Nếu vẫn lỗi 406, khả năng cao là do m chưa bật RLS hoặc thiếu Policy Select cho bảng Settings
+            status.innerText = "Lỗi " + (err.status || "") + ": Check Console (F12) ngay m ơi!";
             btn.disabled = false;
         }
     }
 
-    // Cho phép nhấn Enter để đăng nhập cho nhanh
     document.getElementById('pass-input').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') checkAuth();
     });
