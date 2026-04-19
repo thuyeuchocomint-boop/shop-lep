@@ -6,111 +6,82 @@ const supabaseClient = window.supabase.createClient(
 let allProducts = [];
 
 async function init() {
-    await initShopeeMini(); 
-    await loadProducts();   
+    await loadSettings(); // Load link mạng xã hội và profile
+    await loadProducts(); // Load sản phẩm
 }
 
-async function initShopeeMini() {
+// 1. Hàm load Link mạng xã hội và Profile
+async function loadSettings() {
   const { data: settings, error } = await supabaseClient.from("Settings").select("*");
   if (error || !settings) return;
 
+  // Chuyển mảng thành đối tượng để dễ gọi
   const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
 
-  // Đổ dữ liệu cơ bản
   if (config.avatar) document.getElementById("display-avatar").src = config.avatar;
   if (config.bio) document.getElementById("display-bio").innerText = config.bio;
   if (config.status) document.getElementById("display-status").innerText = `💬 Lép nói: ${config.status}`;
 
-  // Hiện thông báo/Tin mới
-  if (config.announcement) {
-    const announceEl = document.getElementById("announcement-bar");
-    announceEl.innerText = config.announcement;
-    announceEl.style.display = "block";
-  }
-
-  // Hiện Gmail
-  if (config.email) {
-    const mailEl = document.getElementById("display-mail");
-    mailEl.innerHTML = `<a href="mailto:${config.email}" class="mail-link">📩 ${config.email}</a>`;
-    mailEl.style.display = "inline-block";
-  }
-
-  // Đổ Social Links
-  ['fb', 'ig', 'threads', 'tiktok', 'yt'].forEach(p => {
-    const link = config[p + '_link'];
+  // Đổ link vào các nút Facebook, TikTok...
+  const platforms = ['fb', 'ig', 'threads', 'tiktok', 'yt'];
+  platforms.forEach(p => {
+    const link = config[p + '_link']; // Tìm key ví dụ: fb_link
     const el = document.getElementById('link-' + p);
-    if (el) { 
-      el.href = link || '#'; 
-      el.style.display = link ? 'inline-block' : 'none'; 
+    if (el && link) {
+      el.href = link;
+      el.style.display = "inline-block";
+    } else if (el) {
+      el.style.display = "none"; // Nếu không có link thì ẩn nút đó đi
     }
   });
 
-  // Logic chào mừng khách (Giữ nguyên của m)
-  const welcomeEl = document.getElementById("welcome-msg");
-  const history = JSON.parse(localStorage.getItem("viewed")) || [];
-  const visitCount = parseInt(localStorage.getItem("visit_count") || "0");
-  localStorage.setItem("visit_count", visitCount + 1);
-
-  if (visitCount === 0 && history.length === 0) {
-    welcomeEl.innerHTML = "Chào m! Lần đầu ghé tiệm Lép à? Xem đồ đi, ok lắm ^.^";
-  } else {
-    const categories = history.map(h => h.category).filter(Boolean);
-    let favoriteCat = categories.length > 0 ? categories.reduce((a, b, i, arr) => 
-        (arr.filter(v => v === a).length >= arr.filter(v => v === b).length ? a : b)) : "";
-
-    if (favoriteCat) {
-      welcomeEl.innerHTML = `Quay lại rồi à? Nhìn m là biết vẫn đang mê mấy món <b>${favoriteCat}</b> rồi!`;
-    } else if (history.length > 0) {
-      welcomeEl.innerHTML = `Vẫn đang tia cái <b>${history[history.length - 1].name}</b> à? Mua lẹ đi !^^`;
-    } else {
-      welcomeEl.innerHTML = "Lại là m à? Lần này định vào ngó gì nào?";
-    }
+  // Gmail
+  if (config.email) {
+    const mailEl = document.getElementById("display-mail");
+    mailEl.innerHTML = `<a href="mailto:${config.email}" class="mail-link">📩 ${config.email}</a>`;
+    mailEl.style.display = "block";
   }
 }
 
-// Các hàm loadProducts, renderProducts, filterProducts... giữ nguyên như cũ
+// 2. Hàm load Sản phẩm
 async function loadProducts() {
     const { data, error } = await supabaseClient.from("Products").select("*");
-    if (error) return;
+    if (error) {
+        console.error("Lỗi load đồ:", error);
+        return;
+    }
     allProducts = data;
-    renderProducts(allProducts);
+    renderProducts(allProducts); // Mặc định hiện tất cả
 }
 
 function renderProducts(products) {
     const shop = document.getElementById("shop");
-    if (products.length === 0) {
-        shop.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #999; padding: 20px;'>Lép chưa có đồ loại này m ơi...</p>";
+    if (!products || products.length === 0) {
+        shop.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #999;'>Lép chưa có đồ loại này m ơi...</p>";
         return;
     }
     shop.innerHTML = products.map(p => `
-        <div class="card" onclick="handleInteraction('${p.id}', '${p.name}', '${p.category}')">
+        <div class="card">
             <img src="${p.image}">
             <h4>${p.name}</h4>
-            <p>${p.desc}</p>
-            <a href="${p.link}" target="_blank" onclick="event.stopPropagation(); buyNow('${p.id}', '${p.name}')">Mua ngay</a>
+            <p style="font-size: 12px; color: #999; margin-bottom: 8px;">${p.desc || ''}</p>
+            <a href="${p.link}" target="_blank">Mua ngay</a>
         </div>
     `).join("");
 }
 
+// 3. Hàm lọc sản phẩm khi bấm nút
 function filterProducts(category, btn) {
+    // Đổi màu nút đang chọn
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    renderProducts(category === 'all' ? allProducts : allProducts.filter(p => p.category === category));
-}
 
-async function handleInteraction(id, name, category) {
-    await supabaseClient.rpc('increment_click', { row_id: id });
-    let history = JSON.parse(localStorage.getItem("viewed")) || [];
-    history.push({id, name, category, time: Date.now()});
-    localStorage.setItem("viewed", JSON.stringify(history.slice(-15)));
-    const welcomeMsg = document.getElementById("welcome-msg");
-    if(welcomeMsg) welcomeMsg.innerHTML = `Thích món <b>${name}</b> này rồi chứ gì? Mua đi!`;
-}
-
-function buyNow(id, name) {
-    let bought = JSON.parse(localStorage.getItem("bought")) || [];
-    bought.push({id, name, time: Date.now()});
-    localStorage.setItem("bought", JSON.stringify(bought));
+    if (category === 'all') {
+        renderProducts(allProducts);
+    } else {
+        const filtered = allProducts.filter(p => p.category === category);
+        renderProducts(filtered);
+    }
 }
 
 init();
