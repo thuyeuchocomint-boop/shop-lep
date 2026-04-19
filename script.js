@@ -87,14 +87,24 @@ function renderProducts(products) {
 
 // 3. INTERACTION: Thống kê Hot & Lưu sở thích
 async function handleInteraction(id, name, category) {
-    // Báo click về cho Dashboard xem cái nào Hot
-    await supabaseClient.rpc('increment_click', { row_id: id });
+    console.log("Đang click món có ID:", id);
 
+    // Truyền đúng tham số row_id kiểu chuỗi
+    const { error } = await supabaseClient.rpc('increment_click', { 
+        row_id: String(id) 
+    });
+
+    if (error) {
+        console.error("Lỗi 400 rồi m ơi:", error.message);
+    } else {
+        console.log("Ngon! Click đã nhảy số.");
+    }
+
+    // --- Các logic đoán ý khách giữ nguyên ---
     let history = JSON.parse(localStorage.getItem("viewed")) || [];
     history.push({id, name, category, time: Date.now()});
-    localStorage.setItem("viewed", JSON.stringify(history.slice(-15))); 
-    
-    document.getElementById("welcome-msg").innerHTML = `Thích món <b>${name}</b> này rồi chứ gì? Mua đi!`;
+    localStorage.setItem("viewed", JSON.stringify(history.slice(-15)));
+    document.getElementById("welcome-msg").innerHTML = `Thích món <b>${name}</b> này rồi chứ gì?`;
 }
 
 function filterProducts(category, btn) {
