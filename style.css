@@ -200,3 +200,26 @@ body {
     background: #5ed3c6;
     border-radius: 10px;
 }
+body {
+    /* Màu loang nhẹ nhàng, không bị chói */
+    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    min-height: 100vh;
+}
+
+/* Tin tức mới */
+.news-flash {
+    background: #fff3cd;
+    border-left: 4px solid #ffca28;
+    padding: 10px;
+    margin: 15px 0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #856404;
+}
+
+/* Card sản phẩm đẹp hơn trên Laptop */
+@media (min-width: 768px) {
+    body { max-width: 900px; }
+    .grid { grid-template-columns: 1fr 1fr 1fr; } /* Hiện 3 cột trên máy tính */
+}
