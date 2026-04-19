@@ -1,52 +1,114 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LÉP 🌱</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LÉP LÀ LEAF 🌱 - Chuyện của Lép</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <header class="profile-section">
-    <div class="avatar-wrap">
-      <img id="display-avatar" src="" class="avatar-img" alt="Lép">
+
+    <header class="profile-section">
+        <div class="avatar-wrap">
+            <img id="display-avatar" src="avatar-default.webp" class="avatar-img" alt="Lép" loading="eager">
+        </div>
+
+        <h1 id="display-name">Lép là Leaf 🌱</h1>
+        <p id="display-bio">Đang tải tiểu sử...</p>
+        
+        <p id="display-email" class="user-email"></p>
+
+        <div id="display-status" class="status-bubble"></div>
+
+        <div class="social-links">
+            <a id="link-fb" href="#" target="_blank" rel="noopener">Facebook</a>
+            <a id="link-ig" href="#" target="_blank" rel="noopener">Instagram</a>
+            <a id="link-tiktok" href="#" target="_blank" rel="noopener">TikTok</a>
+            <a id="link-yt" href="#" target="_blank" rel="noopener">YouTube</a>
+        </div>
+
+        <div id="welcome-msg" class="welcome-text"></div>
+    </header>
+
+    <section class="section">
+        <h2 class="section-title">🌱 Lép chọn cho bạn</h2>
+
+        <div class="category-container">
+            <div class="filter-group">
+                <button class="cat-btn active" onclick="filterProducts('all', this)">Tất cả</button>
+                <button class="cat-btn" onclick="filterProducts('mỹ phẩm', this)">Mỹ phẩm</button>
+                <button class="cat-btn" onclick="filterProducts('quần áo', this)">Quần áo</button>
+                <button class="cat-btn" onclick="filterProducts('decor', this)">Decor</button>
+                <button class="cat-btn" onclick="filterProducts('sách', this)">Sách</button>
+                <button class="cat-btn" onclick="filterProducts('học tập', this)">Học tập</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="tag-container">
+            <p class="tag-label">Lọc nhanh theo nhu cầu:</p>
+            <div class="tag-filter">
+                <button class="tag-btn active" onclick="setFilter('all')">Tất cả</button>
+                <button class="tag-btn" onclick="setFilter('oily')">Da dầu</button>
+                <button class="tag-btn" onclick="setFilter('mụn')">Da mụn</button>
+                <button class="tag-btn" onclick="setFilter('dry')">Da khô</button>
+                <button class="tag-btn" onclick="setFilter('self-help')">Phát triển bản thân</button>
+                <button class="tag-btn" onclick="setFilter('tiểu thuyết')">Tiểu thuyết</button>
+                <button class="tag-btn" onclick="setFilter('cute')">Decor cute</button>
+            </div>
+        </div>
+        <h3 id="filter-title" class="filter-status-text"></h3>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">🔥 Gợi ý riêng cho bạn</h2>
+        </div>
+
+        <div id="recommend-loading" class="grid loading-box">
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+        </div>
+
+        <div id="recommend" class="grid-container"></div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">🛍️ Tất cả sản phẩm</h2>
+        </div>
+
+        <div id="shop-loading" class="grid loading-box">
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+            <div class="card skeleton"></div>
+        </div>
+
+        <div id="shop" class="grid-container"></div>
+    </section>
+
+    <div class="lep-fixed-wrap">
+        <img src="lep-idle.webp" class="lep-base" alt="Lép Mascot">
+        <img src="lep-blink.webp" class="lep-blink" alt="Lép nháy mắt">
     </div>
-    <h1 id="display-name">Lép là Leaf 🌱</h1>
-    <p id="display-bio">Đang tải tiểu sử...</p>
-    
-    <div id="display-mail" style="display: none;"></div>
-    
-    <div id="display-status" class="status-bubble"></div>
-    <div class="social-links">
-      <a id="link-fb" href="#" target="_blank">Facebook</a>
-      <a id="link-ig" href="#" target="_blank">Instagram</a>
-      <a id="link-threads" href="#" target="_blank">Threads</a>
-      <a id="link-tiktok" href="#" target="_blank">TikTok</a>
-      <a id="link-yt" href="#" target="_blank">YouTube</a>
+
+    <div id="quizBox" class="quiz-card">
+        <div class="quiz-content">
+            <h3>Lép giúp m chọn đồ nhé? 🌱</h3>
+            <p>Da bạn hiện tại đang gặp vấn đề gì?</p>
+            <div class="quiz-options">
+                <button onclick="answerQuiz('oily')">Nhiều dầu</button>
+                <button onclick="answerQuiz('dry')">Hơi khô</button>
+                <button onclick="answerQuiz('sensitive')">Nhạy cảm</button>
+            </div>
+        </div>
     </div>
-    <div id="welcome-msg" class="welcome-text"></div>
-  </header>
 
-  <h2 class="section-title">🌱 ĐỒ LÉP CHỌN...</h2>
-  <div class="category-container">
-    <div class="category-filter">
-      <button class="cat-btn active" onclick="filterProducts('all', this)">Tất cả</button>
-      <button class="cat-btn" onclick="filterProducts('mĩ phẩm', this)">Mĩ phẩm</button>
-      <button class="cat-btn" onclick="filterProducts('quần áo', this)">Quần áo</button>
-      <button class="cat-btn" onclick="filterProducts('decor', this)">Decor</button>
-      <button class="cat-btn" onclick="filterProducts('sách', this)">Sách</button>
-      <button class="cat-btn" onclick="filterProducts('dụng cụ học tập', this)">Học tập</button>
-    </div>
-  </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
 
-  <div id="shop" class="grid"></div>
-
-  <div class="lep-wrap">
-    <img src="lep-idle.webp" class="lep-base">
-    <img src="lep-blink.webp" class="lep-blink">
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js"></script>
 </body>
 </html>

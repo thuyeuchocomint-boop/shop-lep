@@ -1,174 +1,299 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <title>Dashboard của Lép 🌱</title>
+    <meta charset="UTF-8">
+    <title>Dashboard của Lép 🌱 Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 900px; margin: auto; background: #f4f4f4; }
-        section { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        input, textarea, select { width: 100%; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { background: #5ed3c6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .product-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
-        .hot { color: red; font-weight: bold; }
+        :root {
+            --primary: #5ed3c6;
+            --primary-dark: #48b4a9;
+            --danger: #ff6b6b;
+            --bg: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            padding: 20px;
+            max-width: 1000px;
+            margin: auto;
+            background: var(--bg);
+            color: #2c3e50;
+        }
+
+        h2 { text-align: center; color: var(--primary-dark); margin-bottom: 30px; }
+
+        section {
+            background: #fff;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        h3 { border-left: 4px solid var(--primary); padding-left: 10px; margin-bottom: 20px; }
+
+        .grid-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--primary); }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        button:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+
+        .stats { color: var(--danger); font-weight: bold; font-size: 13px; }
+
+        #preview { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; display: none; margin-bottom: 15px; border: 2px solid var(--primary); }
+
+        /* Auth UI */
+        #auth-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: white; z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
     </style>
 </head>
+
 <body>
-    <div id="auth-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-    <h2 style="color:#5ed3c6">Tiệm của Lép - Admin 🌱</h2>
-    <div id="auth-box">
-        <p>Nhập mật khẩu quản trị:</p>
-        <input type="password" id="pass-input" style="width:250px; padding:10px; border:2px solid #5ed3c6; border-radius:8px; margin-bottom:10px; text-align:center;">
-        <button id="btn-login" onclick="checkAuth()" style="background:#5ed3c6; color:white; border:none; padding:10px 30px; border-radius:8px; cursor:pointer; font-weight:bold;">Vào ngay</button>
-    </div>
-    <p id="auth-status" style="margin-top:15px; color:#666; font-size:14px;"></p>
+
+<div id="auth-overlay">
+    <h2 style="font-size: 28px;">Lép Admin 🌱</h2>
+    <input type="password" id="pass-input" style="max-width: 300px; text-align: center;" placeholder="Mật khẩu bí mật">
+    <button onclick="checkAuth()">Xác nhận danh tính</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    const supabaseAuth = supabase.createClient("https://ebraxafpawypwmntoglw.supabase.co", "sb_publishable_DhXag1beuBobuA8n4580Eg_hPUZJ9P0");
+<h2>🌱 Bảng điều khiển Tiệm của Lép</h2>
 
-    async function checkAuth() {
-        const input = document.getElementById('pass-input').value;
-        const status = document.getElementById('auth-status');
-        const btn = document.getElementById('btn-login');
+<section>
+    <h3>1. Cấu hình Profile & Link</h3>
+    <div class="grid-form">
+        <input id="set-avatar" placeholder="Link ảnh Avatar">
+        <input id="set-status" placeholder="Câu nói của Lép (Status)">
+        <input id="set-fb" placeholder="Link Facebook">
+        <input id="set-tiktok" placeholder="Link TikTok">
+        <input id="set-ig" placeholder="Link Instagram">
+        <input id="set-mail" placeholder="Địa chỉ Email">
+    </div>
+    <textarea id="set-bio" placeholder="Viết tiểu sử ngắn gọn..." rows="3"></textarea>
+    <button onclick="updateSettings()">Lưu cấu hình</button>
+</section>
 
-        if (!input) {
-            alert("Mày định vào tay không à? Nhập pass vào!");
-            return;
-        }
-
-        btn.disabled = true;
-        status.innerText = "Đang hỏi tội Database...";
-
-        try {
-            // SỬA LỖI 406 TẠI ĐÂY: Dùng maybeSingle() để Supabase không bắt bẻ header
-            const { data, error } = await supabaseAuth
-                .from('Settings')
-                .select('value')
-                .eq('key', 'admin_password')
-                .maybeSingle(); 
-
-            if (error) throw error;
-
-            if (data && input.trim() === data.value.trim()) {
-                status.innerText = "Chuẩn rồi m ơi! Đang vào...";
-                setTimeout(() => {
-                    document.getElementById('auth-overlay').style.display = 'none';
-                }, 500);
-            } else {
-                alert("Mỏ xéo sắc mà nhập pass sai à? Biến!");
-                window.location.href = "index.html";
-            }
-        } catch (err) {
-            console.error("Lỗi chi tiết:", err);
-            // Nếu vẫn lỗi 406, khả năng cao là do m chưa bật RLS hoặc thiếu Policy Select cho bảng Settings
-            status.innerText = "Lỗi " + (err.status || "") + ": Check Console (F12) ngay m ơi!";
-            btn.disabled = false;
-        }
-    }
-
-    document.getElementById('pass-input').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') checkAuth();
-    });
-</script>
-    <h2>🌱 Quản lý Tiệm của Lép</h2>
-
-    <section>
-        <h3>Cập nhật Profile & Link</h3>
-        <input id="set-avatar" placeholder="Link ảnh Avatar mới">
-        <textarea id="set-bio" placeholder="Tiểu sử (Mỏ xéo sắc hay gì viết vào đây...)"></textarea>
-        <input id="set-status" placeholder="Cảm nghĩ hôm nay của Lép">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <input id="set-fb" placeholder="Link Facebook">
-            <input id="set-tiktok" placeholder="Link TikTok">
-            <input id="set-ig" placeholder="Link Instagram">
-            <input id="set-mail" placeholder="Gmail liên hệ">
-        </div>
-        <button onclick="updateSettings()">Lưu thay đổi</button>
-    </section>
-
-    <section>
-        <h3>Đăng sản phẩm mới</h3>
+<section>
+    <h3>2. Thêm / Sửa sản phẩm</h3>
+    <div class="grid-form">
         <input id="p-name" placeholder="Tên sản phẩm">
-        <input id="p-desc" placeholder="Mô tả ngắn">
-        <input id="p-link" placeholder="Link Shopee/Affiliate">
+        <input id="p-price" type="number" placeholder="Giá tiền (ví dụ: 150000)">
+        <input id="p-link" placeholder="Link Affiliate">
         <select id="p-cat">
-            <option value="mĩ phẩm">Mĩ phẩm</option>
+            <option value="mỹ phẩm">Mỹ phẩm</option>
             <option value="quần áo">Quần áo</option>
             <option value="decor">Decor</option>
             <option value="sách">Sách</option>
-            <option value="dụng cụ học tập">Học tập</option>
+            <option value="học tập">Học tập</option>
         </select>
-        <input type="file" id="p-file">
-        <button onclick="addProduct()">Đăng đồ</button>
-    </section>
+    </div>
+    <input id="p-tags" placeholder="Tags (cách nhau bằng dấu phẩy, ví dụ: oily, mụn, cute)">
+    <textarea id="p-desc" placeholder="Review ngắn của Lép..." rows="2"></textarea>
+    
+    <label style="display:block; margin-bottom:5px; font-weight:600;">Ảnh sản phẩm:</label>
+    <input type="file" id="p-file" accept="image/*">
+    <img id="preview">
 
-    <section>
-        <h3>Danh sách đồ (Thống kê độ HOT)</h3>
-        <div id="product-list">Đang tải...</div>
-    </section>
+    <div id="action-btns">
+        <button id="btn-save" onclick="addOrUpdateProduct()">Lưu sản phẩm</button>
+        <button id="btn-cancel" style="background:#95a5a6; display:none;" onclick="cancelEdit()">Hủy sửa</button>
+    </div>
+</section>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const supabaseClient = supabase.createClient("https://ebraxafpawypwmntoglw.supabase.co", "sb_publishable_DhXag1beuBobuA8n4580Eg_hPUZJ9P0");
+<section>
+    <h3>3. Danh sách sản phẩm</h3>
+    <div id="product-list">Đang tải dữ liệu...</div>
+</section>
 
-        // Load dữ liệu cũ lên form
-        async function loadData() {
-            const { data: settings } = await supabaseClient.from("Settings").select("*");
-            const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
-            if(config.avatar) document.getElementById("set-avatar").value = config.avatar;
-            if(config.bio) document.getElementById("set-bio").value = config.bio;
-            
-            const { data: products } = await supabaseClient.from("Products").select("*").order('click_count', { ascending: false });
-            document.getElementById("product-list").innerHTML = products.map(p => `
-                <div class="product-item">
-                    <span><b>${p.name}</b> - <span class="hot">${p.click_count || 0} Click</span></span>
-                    <button style="background: #ff6b6b;" onclick="deleteProduct('${p.id}')">Xoá</button>
-                </div>
-            `).join("");
-        }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabaseClient = supabase.createClient(
+    "https://ebraxafpawypwmntoglw.supabase.co",
+    "sb_publishable_DhXag1beuBobuA8n4580Eg_hPUZJ9P0"
+);
 
-        async function updateSettings() {
-            const s = {
-                avatar: document.getElementById("set-avatar").value,
-                bio: document.getElementById("set-bio").value,
-                status: document.getElementById("set-status").value,
-                fb_link: document.getElementById("set-fb").value,
-                tiktok_link: document.getElementById("set-tiktok").value,
-                email: document.getElementById("set-mail").value
-            };
-            for (const [key, value] of Object.entries(s)) {
-                if(value) await supabaseClient.from("Settings").upsert({ key, value });
-            }
-            alert("Lưu xong rồi m!");
-        }
+let products = [];
+let editingId = null;
 
-        async function addProduct() {
-            const file = document.getElementById("p-file").files[0];
-            if(!file) return alert("Thiếu ảnh m ơi!");
-            
-            const fileName = Date.now() + "_" + file.name;
-            await supabaseClient.storage.from("images").upload(fileName, file);
-            const { data: { publicUrl } } = supabaseClient.storage.from("images").getPublicUrl(fileName);
-
-            await supabaseClient.from("Products").insert([{
-                name: document.getElementById("p-name").value,
-                desc: document.getElementById("p-desc").value,
-                link: document.getElementById("p-link").value,
-                category: document.getElementById("p-cat").value,
-                image: publicUrl,
-                click_count: 0
-            }]);
-            alert("Đã thêm đồ!");
-            location.reload();
-        }
-
-        async function deleteProduct(id) {
-            if(confirm("Xoá thật à m?")) {
-                await supabaseClient.from("Products").delete().eq('id', id);
-                location.reload();
-            }
-        }
+async function checkAuth() {
+    const input = document.getElementById("pass-input").value;
+    const { data } = await supabaseClient.from("Settings").select("value").eq("key", "admin_password").maybeSingle();
+    
+    if (data && input === data.value) {
+        localStorage.setItem("admin_auth", "true");
+        document.getElementById("auth-overlay").style.display = "none";
         loadData();
-    </script>
+    } else {
+        alert("Mật khẩu sai rồi mày ơi!");
+    }
+}
+
+if (localStorage.getItem("admin_auth") === "true") {
+    document.getElementById("auth-overlay").style.display = "none";
+}
+
+async function loadData() {
+    const { data: settings } = await supabaseClient.from("Settings").select("*");
+    if (settings) {
+        const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
+        document.getElementById("set-avatar").value = config.avatar || "";
+        document.getElementById("set-bio").value = config.bio || "";
+        document.getElementById("set-status").value = config.status || "";
+        document.getElementById("set-fb").value = config.fb_link || "";
+        document.getElementById("set-tiktok").value = config.tiktok_link || "";
+        document.getElementById("set-ig").value = config.ig_link || "";
+        document.getElementById("set-mail").value = config.email || "";
+    }
+
+    const { data } = await supabaseClient.from("products").select("*").order("created_at", { ascending: false });
+    products = data || [];
+    renderProducts();
+}
+
+function renderProducts() {
+    document.getElementById("product-list").innerHTML = products.map(p => `
+        <div class="product-item">
+            <div>
+                <strong>${p.name}</strong> <small>(${p.category})</small><br>
+                <span class="stats">🔥 ${p.click_count || 0} clicks</span>
+            </div>
+            <div>
+                <button onclick="editProduct('${p.id}')">Sửa</button>
+                <button style="background:var(--danger)" onclick="deleteProduct('${p.id}')">Xoá</button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function editProduct(id) {
+    const p = products.find(x => x.id == id);
+    if (!p) return;
+    editingId = id;
+    document.getElementById("p-name").value = p.name;
+    document.getElementById("p-price").value = p.price || "";
+    document.getElementById("p-link").value = p.link;
+    document.getElementById("p-cat").value = p.category;
+    document.getElementById("p-tags").value = p.tags ? p.tags.join(",") : "";
+    document.getElementById("p-desc").value = p.review || "";
+    document.getElementById("btn-cancel").style.display = "inline-block";
+    document.getElementById("btn-save").innerText = "Cập nhật sản phẩm";
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+}
+
+function cancelEdit() {
+    editingId = null;
+    clearForm();
+    document.getElementById("btn-cancel").style.display = "none";
+    document.getElementById("btn-save").innerText = "Lưu sản phẩm";
+}
+
+async function addOrUpdateProduct() {
+    const name = document.getElementById("p-name").value;
+    const price = parseInt(document.getElementById("p-price").value);
+    const link = document.getElementById("p-link").value;
+    const category = document.getElementById("p-cat").value;
+    const tags = document.getElementById("p-tags").value.split(",").map(t => t.trim()).filter(t => t);
+    const review = document.getElementById("p-desc").value;
+    const file = document.getElementById("p-file").files[0];
+
+    let imageUrl = products.find(x => x.id == editingId)?.image || null;
+
+    if (file) {
+        const fileName = Date.now() + "_" + file.name;
+        const { error } = await supabaseClient.storage.from("images").upload(fileName, file);
+        if(!error) imageUrl = supabaseClient.storage.from("images").getPublicUrl(fileName).data.publicUrl;
+    }
+
+    const payload = { name, price, link, category, tags, review, image: imageUrl };
+
+    if (editingId) {
+        await supabaseClient.from("products").update(payload).eq("id", editingId);
+    } else {
+        await supabaseClient.from("products").insert([{ ...payload, click_count: 0 }]);
+    }
+
+    cancelEdit();
+    loadData();
+}
+
+async function deleteProduct(id) {
+    if (confirm("Mày chắc chắn muốn xoá? Không hoàn tác được đâu!")) {
+        await supabaseClient.from("products").delete().eq("id", id);
+        loadData();
+    }
+}
+
+async function updateSettings() {
+    const s = {
+        avatar: document.getElementById("set-avatar").value,
+        bio: document.getElementById("set-bio").value,
+        status: document.getElementById("set-status").value,
+        fb_link: document.getElementById("set-fb").value,
+        tiktok_link: document.getElementById("set-tiktok").value,
+        ig_link: document.getElementById("set-ig").value,
+        email: document.getElementById("set-mail").value
+    };
+
+    for (const [key, value] of Object.entries(s)) {
+        await supabaseClient.from("Settings").upsert({ key, value });
+    }
+    alert("Đã lưu cấu hình mới!");
+}
+
+document.getElementById("p-file").addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (file) {
+        document.getElementById("preview").src = URL.createObjectURL(file);
+        document.getElementById("preview").style.display = "block";
+    }
+});
+
+function clearForm() {
+    ["p-name", "p-price", "p-link", "p-tags", "p-desc"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("p-file").value = "";
+    document.getElementById("preview").style.display = "none";
+}
+
+loadData();
+</script>
 </body>
 </html>
