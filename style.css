@@ -226,17 +226,45 @@ body {
     margin: 5px 0;
 }
 
-.card a {
+/* Sửa từ .card a thành .card .btn-go vì JS của m dùng thẻ button */
+.card .btn-go {
     display: block;
-    text-align: center;
+    width: 100%;
+    border: none;
     background: var(--primary);
     color: var(--white);
-    text-decoration: none;
-    padding: 8px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
+    padding: 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
     margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+.card .btn-go:hover {
+    background: var(--primary-dark);
+    transform: scale(1.02);
+}
+
+/* Quan trọng: Fix lỗi không thấy "test" khi đang load */
+.skeleton {
+    min-height: 180px; /* Phải có chiều cao mới thấy nó nháy nháy */
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 16px;
+}
+
+/* Sửa lỗi con Lép bị height = 0 */
+.lep-fixed-wrap {
+    position: fixed;
+    bottom: 25px;
+    right: 15px;
+    width: 80px;
+    height: 100px; /* Thêm cái này để dễ bấm */
+    z-index: 1001;
+    cursor: pointer;
 }
 
 /* --- 5. QUIZ CARD --- */
@@ -345,4 +373,74 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+a, button {
+    cursor: pointer;
+    touch-action: manipulation; /* Tối ưu cho cảm ứng */
+    position: relative;
+    z-index: 10; /* Đảm bảo nổi lên trên các layer khác */
+}
+/* --- NÂNG CẤP BIẾN ĐỂ DỄ ĐỔI MÀU --- */
+:root {
+    --primary: #5ed3c6; 
+    --primary-dark: #48b4a9;
+    --accent-orange: #ff9f43; /* Màu phụ để nhấn các nút quan trọng */
+    /* ... giữ nguyên các biến khác ... */
+}
+
+/* --- HIỆU ỨNG CARD CHUYÊN NGHIỆP --- */
+.card {
+    border: 1px solid rgba(0,0,0,0.03); /* Thêm viền cực mảnh để nhìn rõ khối */
+    background: var(--white);
+    /* ... các thuộc tính cũ ... */
+}
+
+.card .price {
+    color: var(--accent-orange); /* Dùng màu cam để kích thích mua hàng */
+    font-size: 16px;
+}
+
+.card button.btn-go { /* Đổi thẻ a thành button như scripts.js mới */
+    width: 100%;
+    border: none;
+    background: var(--primary);
+    color: var(--white);
+    padding: 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.card button.btn-go:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 12px rgba(94, 211, 198, 0.4);
+}
+
+/* --- HIỆU ỨNG LÉP "NÓI" (Tooltip) --- */
+.chat-hint {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: var(--text-main);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 10px;
+    font-size: 11px;
+    white-space: nowrap;
+    animation: floating 2s infinite ease-in-out;
+}
+
+.chat-hint::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    right: 20px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid var(--text-main);
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
 }

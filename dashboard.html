@@ -2,40 +2,60 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard của Lép 🌱 Admin</title>
+    <title>Lép Admin 🌱 Dashboard Xịn</title>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #5ed3c6;
             --primary-dark: #48b4a9;
             --danger: #ff6b6b;
-            --bg: #f4f7f6;
+            --bg: #f0f2f5;
+            --white: #ffffff;
         }
 
         body {
             font-family: 'Be Vietnam Pro', sans-serif;
             padding: 20px;
-            max-width: 1000px;
+            max-width: 1100px;
             margin: auto;
             background: var(--bg);
             color: #2c3e50;
         }
 
-        h2 { text-align: center; color: var(--primary-dark); margin-bottom: 30px; }
+        h2 { text-align: center; color: var(--primary-dark); margin-bottom: 30px; font-weight: 700; }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .stat-card h4 { margin: 0; color: #7f8c8d; font-size: 14px; }
+        .stat-card p { margin: 10px 0 0; font-size: 28px; font-weight: 700; color: var(--primary-dark); }
 
         section {
-            background: #fff;
+            background: var(--white);
             padding: 25px;
             border-radius: 16px;
             margin-bottom: 25px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
-        h3 { border-left: 4px solid var(--primary); padding-left: 10px; margin-bottom: 20px; }
+        h3 { border-left: 5px solid var(--primary); padding-left: 15px; margin-bottom: 20px; font-size: 18px; }
 
         .grid-form {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
         }
 
@@ -43,19 +63,22 @@
             width: 100%;
             margin-bottom: 15px;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid #e0e0e0;
             border-radius: 10px;
             font-size: 14px;
             outline: none;
+            box-sizing: border-box;
         }
 
-        input:focus { border-color: var(--primary); }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(94, 211, 198, 0.2); }
 
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
         button {
+            flex: 1;
             background: var(--primary);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 12px;
             border-radius: 10px;
             cursor: pointer;
             font-weight: 700;
@@ -63,26 +86,37 @@
         }
 
         button:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        button.btn-danger { background: var(--danger); }
+        button.btn-secondary { background: #95a5a6; }
 
-        .product-item {
+        .item-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .list-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #fafafa;
-            margin-bottom: 10px;
             padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            transition: 0.2s;
         }
 
-        .stats { color: var(--danger); font-weight: bold; font-size: 13px; }
+        .list-row:hover { background: #f9f9f9; }
 
-        #preview { width: 120px; height: 120px; object-fit: cover; border-radius: 10px; display: none; margin-bottom: 15px; border: 2px solid var(--primary); }
+        .tag-badge {
+            background: #e8f8f5;
+            color: var(--primary-dark);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-right: 5px;
+        }
 
-        /* Auth UI */
         #auth-overlay {
             position: fixed; top:0; left:0; width:100%; height:100%;
-            background: white; z-index: 99999;
+            background: var(--white); z-index: 100;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
     </style>
@@ -91,58 +125,77 @@
 <body>
 
 <div id="auth-overlay">
-    <h2 style="font-size: 28px;">Lép Admin 🌱</h2>
-    <input type="password" id="pass-input" style="max-width: 300px; text-align: center;" placeholder="Mật khẩu bí mật">
-    <button onclick="checkAuth()">Xác nhận danh tính</button>
+    <h2>Lép Admin 🌱</h2>
+    <input type="password" id="pass-input" style="max-width: 300px; text-align: center;" placeholder="Nhập mật khẩu đi m">
+    <button onclick="checkAuth()" style="max-width: 300px; width: 100%;">Vào tiệm</button>
 </div>
 
-<h2>🌱 Bảng điều khiển Tiệm của Lép</h2>
+<h2>🌱 Dashboard Quản Trị Lép là Leaf</h2>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <h4>Tổng sản phẩm</h4>
+        <p id="stat-total-p">0</p>
+    </div>
+    <div class="stat-card">
+        <h4>Tổng lượt Click</h4>
+        <p id="stat-total-clicks">0</p>
+    </div>
+    <div class="stat-card">
+        <h4>Sản phẩm Hot nhất</h4>
+        <p id="stat-hot" style="font-size: 16px;">Đang tính...</p>
+    </div>
+</div>
 
 <section>
-    <h3>1. Cấu hình Profile & Link</h3>
+    <h3>1. Cấu hình Tiệm</h3>
     <div class="grid-form">
         <input id="set-avatar" placeholder="Link ảnh Avatar">
-        <input id="set-status" placeholder="Câu nói của Lép (Status)">
-        <input id="set-fb" placeholder="Link Facebook">
+        <input id="set-status" placeholder="Lép đang nói gì?">
+        <input id="set-fb" placeholder="Link FB">
         <input id="set-tiktok" placeholder="Link TikTok">
-        <input id="set-ig" placeholder="Link Instagram">
-        <input id="set-mail" placeholder="Địa chỉ Email">
+        <input id="set-mail" placeholder="Email">
     </div>
-    <textarea id="set-bio" placeholder="Viết tiểu sử ngắn gọn..." rows="3"></textarea>
-    <button onclick="updateSettings()">Lưu cấu hình</button>
+    <textarea id="set-bio" placeholder="Tiểu sử tiệm..." rows="2"></textarea>
+    <button onclick="updateSettings()">Cập nhật thông tin</button>
 </section>
 
-<section>
-    <h3>2. Thêm / Sửa sản phẩm</h3>
-    <div class="grid-form">
-        <input id="p-name" placeholder="Tên sản phẩm">
-        <input id="p-price" type="number" placeholder="Giá tiền (ví dụ: 150000)">
-        <input id="p-link" placeholder="Link Affiliate">
-        <select id="p-cat">
-            <option value="mỹ phẩm">Mỹ phẩm</option>
-            <option value="quần áo">Quần áo</option>
-            <option value="decor">Decor</option>
-            <option value="sách">Sách</option>
-            <option value="học tập">Học tập</option>
-        </select>
-    </div>
-    <input id="p-tags" placeholder="Tags (cách nhau bằng dấu phẩy, ví dụ: oily, mụn, cute)">
-    <textarea id="p-desc" placeholder="Review ngắn của Lép..." rows="2"></textarea>
-    
-    <label style="display:block; margin-bottom:5px; font-weight:600;">Ảnh sản phẩm:</label>
-    <input type="file" id="p-file" accept="image/*">
-    <img id="preview">
+<div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;">
+    <section>
+        <h3>2. Sản phẩm (Affiliate)</h3>
+        <div class="grid-form">
+            <input id="p-name" placeholder="Tên món đồ">
+            <input id="p-price" type="number" placeholder="Giá (VND)">
+            <input id="p-link" placeholder="Link Shopee/TikTok">
+            <select id="p-cat">
+                <option value="mỹ phẩm">Mỹ phẩm</option>
+                <option value="decor">Decor</option>
+                <option value="sách">Sách</option>
+                <option value="học tập">Học tập</option>
+            </select>
+        </div>
+        <input id="p-tags" placeholder="Tags (ví dụ: mụn, da dầu, xinh)">
+        <textarea id="p-desc" placeholder="Lép review món này thế nào?" rows="2"></textarea>
+        <div class="btn-group">
+            <button id="btn-save" onclick="addOrUpdateProduct()">Lưu món này</button>
+            <button id="btn-cancel" class="btn-secondary" style="display:none;" onclick="cancelEdit()">Hủy</button>
+        </div>
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+        <div class="item-list" id="product-list">Đang tải...</div>
+    </section>
 
-    <div id="action-btns">
-        <button id="btn-save" onclick="addOrUpdateProduct()">Lưu sản phẩm</button>
-        <button id="btn-cancel" style="background:#95a5a6; display:none;" onclick="cancelEdit()">Hủy sửa</button>
-    </div>
-</section>
-
-<section>
-    <h3>3. Danh sách sản phẩm</h3>
-    <div id="product-list">Đang tải dữ liệu...</div>
-</section>
+    <section>
+        <h3>3. Quản lý Quiz (Hệ thống Care)</h3>
+        <p style="font-size: 12px; color: #7f8c8d; margin-bottom: 10px;">* Thêm câu hỏi để khách tự động được tư vấn.</p>
+        <input id="q-step" type="number" placeholder="Thứ tự (1, 2, 3...)">
+        <input id="q-text" placeholder="Nội dung câu hỏi?">
+        <input id="q-key" placeholder="Key (ví dụ: category)">
+        <textarea id="q-options" placeholder='Định dạng: [{"text":"Mỹ phẩm","value":"beauty"}]' rows="3"></textarea>
+        <button onclick="saveQuiz()" style="width: 100%;">Lưu câu hỏi</button>
+        
+        <div class="item-list" id="quiz-list" style="margin-top: 20px;"></div>
+    </section>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -157,21 +210,28 @@ let editingId = null;
 async function checkAuth() {
     const input = document.getElementById("pass-input").value;
     const { data } = await supabaseClient.from("Settings").select("value").eq("key", "admin_password").maybeSingle();
-    
     if (data && input === data.value) {
         localStorage.setItem("admin_auth", "true");
         document.getElementById("auth-overlay").style.display = "none";
         loadData();
-    } else {
-        alert("Mật khẩu sai rồi mày ơi!");
-    }
+    } else { alert("Sai mật khẩu rồi mày!"); }
 }
 
 if (localStorage.getItem("admin_auth") === "true") {
     document.getElementById("auth-overlay").style.display = "none";
+    loadData();
 }
 
 async function loadData() {
+    // Load Settings
+    // Thêm dòng này vào đầu hàm loadData() trong file Admin
+    async function loadData() {
+        if (localStorage.getItem("admin_auth") !== "true") {
+            document.getElementById("auth-overlay").style.display = "flex";
+            return; // Dừng luôn không cho load dữ liệu bên dưới
+        }
+    // ... code load data cũ
+    }
     const { data: settings } = await supabaseClient.from("Settings").select("*");
     if (settings) {
         const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
@@ -180,28 +240,95 @@ async function loadData() {
         document.getElementById("set-status").value = config.status || "";
         document.getElementById("set-fb").value = config.fb_link || "";
         document.getElementById("set-tiktok").value = config.tiktok_link || "";
-        document.getElementById("set-ig").value = config.ig_link || "";
         document.getElementById("set-mail").value = config.email || "";
     }
 
-    const { data } = await supabaseClient.from("products").select("*").order("created_at", { ascending: false });
+    // Load Products & Stats
+    const { data } = await supabaseClient.from("products").select("*").order("clicks", { ascending: false });
     products = data || [];
     renderProducts();
+    updateStats();
+
+    // Load Quiz
+    loadQuizData();
+}
+
+function updateStats() {
+    const totalP = products.length;
+    const totalClicks = products.reduce((sum, p) => sum + (p.clicks || 0), 0);
+    const hotP = products.length > 0 ? products[0].name : "Chưa có";
+    
+    document.getElementById("stat-total-p").innerText = totalP;
+    document.getElementById("stat-total-clicks").innerText = totalClicks;
+    document.getElementById("stat-hot").innerText = hotP;
 }
 
 function renderProducts() {
     document.getElementById("product-list").innerHTML = products.map(p => `
-        <div class="product-item">
+        <div class="list-row">
             <div>
-                <strong>${p.name}</strong> <small>(${p.category})</small><br>
-                <span class="stats">🔥 ${p.click_count || 0} clicks</span>
+                <strong>${p.name}</strong> <span style="color:#95a5a6; font-size:12px;">#${p.category}</span><br>
+                <span style="color:var(--danger); font-size:12px; font-weight:700;">🔥 ${p.clicks || 0} clicks</span>
             </div>
             <div>
-                <button onclick="editProduct('${p.id}')">Sửa</button>
-                <button style="background:var(--danger)" onclick="deleteProduct('${p.id}')">Xoá</button>
+                <button onclick="editProduct('${p.id}')" style="padding: 5px 10px; font-size:12px;">Sửa</button>
+                <button class="btn-danger" onclick="deleteProduct('${p.id}')" style="padding: 5px 10px; font-size:12px;">Xoá</button>
             </div>
         </div>
     `).join("");
+}
+
+// Logic cho Quiz (No-code)
+async function loadQuizData() {
+    const { data } = await supabaseClient.from("quizzes").select("*").order("step", { ascending: true });
+    if (data) {
+        document.getElementById("quiz-list").innerHTML = data.map(q => `
+            <div class="list-row" style="font-size:13px;">
+                <span><b>B${q.step}:</b> ${q.question}</span>
+                <button class="btn-danger" onclick="deleteQuiz('${q.id}')" style="max-width:50px; padding:2px;">Xoá</button>
+            </div>
+        `).join("");
+    }
+}
+
+async function saveQuiz() {
+    const step = document.getElementById("q-step").value;
+    const question = document.getElementById("q-text").value;
+    const key = document.getElementById("q-key").value;
+    const options = JSON.parse(document.getElementById("q-options").value);
+
+    await supabaseClient.from("quizzes").insert([{ step, question, key, options }]);
+    alert("Đã thêm câu hỏi!");
+    loadQuizData();
+}
+
+async function deleteQuiz(id) {
+    if(confirm("Xoá câu hỏi này?")) {
+        await supabaseClient.from("quizzes").delete().eq("id", id);
+        loadQuizData();
+    }
+}
+
+// ... Các hàm addOrUpdateProduct, editProduct, deleteProduct giữ nguyên logic cũ 
+// nhưng nhớ đổi 'click_count' thành 'clicks' trong code của mày nhé!
+
+async function addOrUpdateProduct() {
+    const name = document.getElementById("p-name").value;
+    const price = parseInt(document.getElementById("p-price").value);
+    const link = document.getElementById("p-link").value;
+    const category = document.getElementById("p-cat").value;
+    const tags = document.getElementById("p-tags").value.split(",").map(t => t.trim());
+    const review = document.getElementById("p-desc").value;
+
+    const payload = { name, price, link, category, tags, review };
+
+    if (editingId) {
+        await supabaseClient.from("products").update(payload).eq("id", editingId);
+    } else {
+        await supabaseClient.from("products").insert([{ ...payload, clicks: 0 }]);
+    }
+    cancelEdit();
+    loadData();
 }
 
 function editProduct(id) {
@@ -215,48 +342,18 @@ function editProduct(id) {
     document.getElementById("p-tags").value = p.tags ? p.tags.join(",") : "";
     document.getElementById("p-desc").value = p.review || "";
     document.getElementById("btn-cancel").style.display = "inline-block";
-    document.getElementById("btn-save").innerText = "Cập nhật sản phẩm";
-    window.scrollTo({ top: 400, behavior: 'smooth' });
+    document.getElementById("btn-save").innerText = "Cập nhật";
 }
 
 function cancelEdit() {
     editingId = null;
-    clearForm();
+    ["p-name", "p-price", "p-link", "p-tags", "p-desc"].forEach(id => document.getElementById(id).value = "");
     document.getElementById("btn-cancel").style.display = "none";
-    document.getElementById("btn-save").innerText = "Lưu sản phẩm";
-}
-
-async function addOrUpdateProduct() {
-    const name = document.getElementById("p-name").value;
-    const price = parseInt(document.getElementById("p-price").value);
-    const link = document.getElementById("p-link").value;
-    const category = document.getElementById("p-cat").value;
-    const tags = document.getElementById("p-tags").value.split(",").map(t => t.trim()).filter(t => t);
-    const review = document.getElementById("p-desc").value;
-    const file = document.getElementById("p-file").files[0];
-
-    let imageUrl = products.find(x => x.id == editingId)?.image || null;
-
-    if (file) {
-        const fileName = Date.now() + "_" + file.name;
-        const { error } = await supabaseClient.storage.from("images").upload(fileName, file);
-        if(!error) imageUrl = supabaseClient.storage.from("images").getPublicUrl(fileName).data.publicUrl;
-    }
-
-    const payload = { name, price, link, category, tags, review, image: imageUrl };
-
-    if (editingId) {
-        await supabaseClient.from("products").update(payload).eq("id", editingId);
-    } else {
-        await supabaseClient.from("products").insert([{ ...payload, click_count: 0 }]);
-    }
-
-    cancelEdit();
-    loadData();
+    document.getElementById("btn-save").innerText = "Lưu món này";
 }
 
 async function deleteProduct(id) {
-    if (confirm("Mày chắc chắn muốn xoá? Không hoàn tác được đâu!")) {
+    if (confirm("Xoá hả m?")) {
         await supabaseClient.from("products").delete().eq("id", id);
         loadData();
     }
@@ -269,31 +366,56 @@ async function updateSettings() {
         status: document.getElementById("set-status").value,
         fb_link: document.getElementById("set-fb").value,
         tiktok_link: document.getElementById("set-tiktok").value,
-        ig_link: document.getElementById("set-ig").value,
         email: document.getElementById("set-mail").value
     };
-
     for (const [key, value] of Object.entries(s)) {
         await supabaseClient.from("Settings").upsert({ key, value });
     }
-    alert("Đã lưu cấu hình mới!");
+    alert("Lưu rồi nhé!");
 }
+// Thêm ô nhập link ảnh vào form sản phẩm ở phần HTML
+// <input id="p-img" placeholder="Link ảnh sản phẩm (URL)">
 
-document.getElementById("p-file").addEventListener("change", e => {
-    const file = e.target.files[0];
-    if (file) {
-        document.getElementById("preview").src = URL.createObjectURL(file);
-        document.getElementById("preview").style.display = "block";
+async function checkAuth() {
+    const input = document.getElementById("pass-input").value;
+    try {
+        const { data, error } = await supabaseClient.from("Settings").select("value").eq("key", "admin_password").maybeSingle();
+        // Nếu DB chưa có pass, cho phép 'admin' là pass mặc định để m vào thiết lập
+        const correctPass = data ? data.value : "admin"; 
+        
+        if (input === correctPass) {
+            localStorage.setItem("admin_auth", "true");
+            document.getElementById("auth-overlay").style.display = "none";
+            loadData();
+        } else {
+            alert("Sai mật khẩu rồi mày!");
+        }
+    } catch (e) {
+        alert("Lỗi kết nối: " + e.message);
     }
-});
-
-function clearForm() {
-    ["p-name", "p-price", "p-link", "p-tags", "p-desc"].forEach(id => document.getElementById(id).value = "");
-    document.getElementById("p-file").value = "";
-    document.getElementById("preview").style.display = "none";
 }
 
-loadData();
+async function addOrUpdateProduct() {
+    const name = document.getElementById("p-name").value;
+    const price = parseInt(document.getElementById("p-price").value);
+    const link = document.getElementById("p-link").value;
+    const image = document.getElementById("p-img").value; // Lấy link ảnh
+    const category = document.getElementById("p-cat").value;
+    const tags = document.getElementById("p-tags").value.split(",").map(t => t.trim());
+    const review = document.getElementById("p-desc").value;
+
+    const payload = { name, price, link, image, category, tags, review };
+
+    if (editingId) {
+        await supabaseClient.from("products").update(payload).eq("id", editingId);
+    } else {
+        await supabaseClient.from("products").insert([{ ...payload, clicks: 0 }]);
+    }
+    alert("Xong rồi!");
+    cancelEdit();
+    loadData();
+}
+<input id="p-img" placeholder="Link ảnh sản phẩm (URL)">
 </script>
 </body>
 </html>
