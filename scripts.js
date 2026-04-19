@@ -1,275 +1,176 @@
-/* --- 1. CONFIG & INIT --- */
 const supabaseClient = window.supabase.createClient(
     "https://ebraxafpawypwmntoglw.supabase.co",
     "sb_publishable_DhXag1beuBobuA8n4580Eg_hPUZJ9P0"
 );
 
 let allProducts = [];
-let quizQuestions = []; // Lưu câu hỏi từ Supabase
-const shopEl = document.getElementById("shop");
-const recommendEl = document.getElementById("recommend");
-const shopLoading = document.getElementById("shop-loading");
+let quizQuestions = [];
+let userChoices = {};
+let currentStep = 0;
 
 async function init() {
     setupWelcomeLogic();
-    // Load đồng thời cả settings, sản phẩm và câu hỏi Quiz
     await Promise.all([loadSettings(), loadProducts(), fetchQuizData()]);
 }
 
-/* --- 2. SETTINGS & PROFILE --- */
+/* --- 1. LOAD SETTINGS & SOCIAL --- */
 async function loadSettings() {
     try {
-        const { data: settings, error } = await supabaseClient.from("Settings").select("*");
+        const { data, error } = await supabaseClient.from("Settings").select("*");
         if (error) throw error;
-        if (!settings) return;
+        const config = Object.fromEntries(data.map(s => [s.key, s.value]));
 
-        const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
-
-        // Load Profile
+        // 1. Cập nhật Avatar & Status
         if (config.avatar) document.getElementById("display-avatar").src = config.avatar;
-        if (config.bio) document.getElementById("display-bio").innerText = config.bio;
-        if (config.status) document.getElementById("display-status").innerText = `💬 Lép nói: ${config.status}`;
-        
-        // Load Social Links (Sửa lại logic ID)
-        ['fb_link', 'ig_link', 'tiktok_link', 'threads_link'].forEach(key => {
-            const el = document.getElementById('link-' + key);
-            if (el) {
-                el.href = config[key] || '#';
-                el.style.display = config[key] ? 'inline-block' : 'none';
+        if (config.status) {
+            document.getElementById("status-area").style.display = "flex";
+            document.getElementById("display-status").innerText = `💬 Lép nói: ${config.status}`;
+        }
+
+        // 2. Hiện Gmail rõ ràng (Đúng ý m)
+        if (config.email) {
+            document.getElementById("display-gmail").innerText = config.email;
+        }
+
+        // 3. Tự động đổ Social Links (Không cần đụng vào HTML)
+        const socialContainer = document.getElementById("social-links-container");
+        socialContainer.innerHTML = ""; // Xóa trắng để nạp mới
+
+        // Danh sách các key social m thường dùng trên Supabase
+        const socialKeys = [
+            { key: 'fb_link', label: 'Facebook' },
+            { key: 'tiktok_link', label: 'TikTok' },
+            { key: 'threads_link', label: 'Threads' },
+            { key: 'ig_link', label: 'Instagram' },
+            { key: 'youtube_link', label: 'Youtube' }
+        ];
+
+        socialKeys.forEach(item => {
+            if (config[item.key]) {
+                const linkIcon = document.createElement("a");
+                linkIcon.href = config[item.key];
+                linkIcon.target = "_blank";
+                linkIcon.innerText = item.label;
+                // Tận dụng class m đã viết trong style.css
+                linkIcon.style.cssText = "text-decoration:none; background:white; padding:8px 15px; border-radius:50px; font-size:12px; font-weight:600; box-shadow: 0 4px 6px rgba(0,0,0,0.05); color: var(--text-dark); border: 1px solid #eee;";
+                socialContainer.appendChild(linkIcon);
             }
         });
-    } catch (err) {
-        console.error("Lỗi load settings:", err);
-    }
+
+        // 4. Mood Theme (Giữ nguyên logic cũ của m)
+        if (config.user_mood) {
+            const moodMap = {
+                'happy': { main: '#22c55e', bg: '#f0fdf4' },
+                'sad': { main: '#3b82f6', bg: '#eff6ff' },
+                'angry': { main: '#ef4444', bg: '#fef2f2' }
+            };
+            const theme = moodMap[config.user_mood] || moodMap['happy'];
+            document.documentElement.style.setProperty('--main-color', theme.main);
+            document.documentElement.style.setProperty('--bg-light', theme.bg);
+        }
+
+    } catch (err) { console.error("Lỗi Settings:", err); }
 }
-
-// Trong hàm renderCard, sửa lại cấu trúc cho chuyên nghiệp
-function renderCard(p) {
-    return `
-        <div class="card animate-fadeIn">
-            <img src="${p.image || 'placeholder.jpg'}" alt="${p.name}" loading="lazy">
-            <h4>${p.name}</h4>
-            <p class="price">${p.price ? p.price.toLocaleString() + 'đ' : 'Giá liên hệ'}</p>
-            <button class="btn-go" onclick="goLink('${p.id}')">Xem giá tốt nhất</button>
-        </div>
-    `;
-}
-
-/* --- 3. WELCOME LOGIC (CÀ KHỊA) --- */
-function setupWelcomeLogic() {
-    const welcomeEl = document.getElementById("welcome-msg");
-    if (!welcomeEl) return;
-
-    let visitCount = parseInt(localStorage.getItem("visit_count") || "0");
-    visitCount++;
-    localStorage.setItem("visit_count", visitCount);
-
-    const history = JSON.parse(localStorage.getItem("viewed") || "[]");
-    const lastItem = history.length > 0 ? history[history.length - 1].name : null;
-
-    if (visitCount === 1) {
-        welcomeEl.innerHTML = "Chào m! Lần đầu ghé tiệm Lép à? 🌱";
-    } else if (visitCount > 15) {
-        welcomeEl.innerHTML = "Lại là m à? Nghiện Lép rồi đúng không? 🙄";
-    } else if (lastItem) {
-        welcomeEl.innerHTML = `Vẫn đang tia <b>${lastItem}</b> à? Múc đi đừng ngại!`;
-    } else {
-        welcomeEl.innerHTML = "Chào mừng m quay lại với hệ tư tưởng Lép! ✨";
-    }
-}
-
-/* --- 4. PRODUCT LOGIC & TRACKING --- */
+/* --- 2. PRODUCT LOGIC --- */
 async function loadProducts() {
     try {
-        // Tạm thời comment đoạn cached này lại để test data thật
-        // const cached = localStorage.getItem("products_cache"); ...
-
         const { data, error } = await supabaseClient.from("products").select("*");
-        if (error) {
-            console.error("Lỗi Supabase:", error.message);
-            return;
-        }
-
-        if (data && data.length > 0) {
-            allProducts = data;
-            renderAllSections(allProducts);
-        } else {
-            console.log("Bảng products đang trống m ơi!");
-        }
-    } catch (err) {
-        console.error("Lỗi hệ thống:", err);
-    } finally {
-        if (shopLoading) shopLoading.style.display = "none";
+        if (error) throw error;
+        allProducts = data || [];
+        renderAllSections(allProducts);
+    } catch (err) { console.error("Lỗi Products:", err); }
+    finally {
+        document.getElementById("shop-loading").style.display = "none";
         document.getElementById("recommend-loading").style.display = "none";
     }
 }
 
 function renderCard(p) {
+    // Thêm hiển thị danh mục (Category) vào thẻ card
     return `
         <div class="card">
-            <img src="${p.image}" alt="${p.name}" loading="lazy">
+            <div class="category-tag">${p.category || 'General'}</div>
+            <img src="${p.image || 'https://via.placeholder.com/150'}" alt="${p.name}">
             <h4>${p.name}</h4>
             <p class="price">${p.price ? p.price.toLocaleString() + 'đ' : 'Giá liên hệ'}</p>
-            <button class="btn-go" onclick="goLink('${p.id}')">Xem giá tốt nhất</button>
-        </div>
-    `;
+            <button class="go-btn" onclick="goLink('${p.id}')">Xem ngay</button>
+        </div>`;
 }
 
-async function renderAllSections(list) {
-    const profileTags = [localStorage.getItem("skin_type")].filter(Boolean);
-    const smartList = [...list].sort((a, b) => {
-        let scoreA = (a.tags?.some(t => profileTags.includes(t)) ? 5 : 0) + (a.verdict === 'good' ? 2 : 0);
-        let scoreB = (b.tags?.some(t => profileTags.includes(t)) ? 5 : 0) + (b.verdict === 'good' ? 2 : 0);
-        return scoreB - scoreA;
-    });
-
-    if (recommendEl) recommendEl.innerHTML = smartList.slice(0, 2).map(renderCard).join("");
+function renderAllSections(list) {
+    const shopEl = document.getElementById("shop");
+    const recommendEl = document.getElementById("recommend");
+    // Gợi ý 2 món hot nhất (dựa theo click hoặc 2 món đầu)
+    if (recommendEl) recommendEl.innerHTML = list.slice(0, 2).map(renderCard).join("");
     if (shopEl) shopEl.innerHTML = list.map(renderCard).join("");
 }
 
-// Hàm xử lý Click chuyên nghiệp cho cả PC và Mobile
-async function goLink(id) {
+window.goLink = async (id) => {
     const product = allProducts.find(p => p.id == id);
     if (!product) return;
+    window.open(product.link, "_blank");
+    // Tăng click ẩn (nếu muốn)
+    await supabaseClient.rpc('increment_clicks', { row_id: id }); 
+};
 
-    // Lưu lịch sử
-    let history = JSON.parse(localStorage.getItem("viewed") || "[]");
-    if (!history.find(h => h.id === id)) {
-        history.push({ id: product.id, name: product.name });
-        localStorage.setItem("viewed", JSON.stringify(history.slice(-5)));
-    }
-
-    // Ghi nhận click vào database (Sử dụng cột clicks trong bảng products)
-    try {
-        const newClickCount = (product.clicks || 0) + 1;
-        await supabaseClient
-            .from("products")
-            .update({ clicks: newClickCount })
-            .eq('id', id);
-    } catch (e) {
-        console.error("Lỗi đếm click:", e);
-    }
-
-    // Mở link (Xử lý cho Mobile ổn định hơn)
-    const newWindow = window.open(product.link, "_blank");
-    if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-        window.location.href = product.link; // Fallback nếu bị chặn popup
-    }
-}
-
-/* --- 5. HỆ THỐNG QUIZ THÔNG MINH (NO-CODE) --- */
-let currentStep = 0;
-let userChoices = {};
-
+/* --- 3. QUIZ LOGIC (Fix gợi ý test) --- */
 async function fetchQuizData() {
-    try {
-        const { data, error } = await supabaseClient
-            .from("quizzes")
-            .select("*")
-            .order("step", { ascending: true });
-        if (data) quizQuestions = data;
-    } catch (err) {
-        console.error("Lỗi tải Quiz:", err);
-    }
+    const { data } = await supabaseClient.from("quizzes").select("*").order("step", { ascending: true });
+    if (data) quizQuestions = data;
 }
 
-function showQuiz() {
-    const quizBox = document.getElementById("quizBox");
-    quizBox.style.display = "block"; // Cho hiện cái hộp lên trước
-    if (quizQuestions.length === 0) {
-        quizBox.innerHTML = "<h3>Đợi Lép tí, đang load câu hỏi...</h3>";
-        return;
-    }
+window.showQuiz = () => {
+    const qBox = document.getElementById("quizBox");
+    qBox.style.display = "block";
+    qBox.scrollIntoView({ behavior: 'smooth' });
+    currentStep = 0;
     renderStep();
-}
+};
 
 function renderStep() {
-    const quizBox = document.getElementById("quizBox");
+    const qBox = document.getElementById("quizBox");
     const q = quizQuestions[currentStep];
-    
-    if (!q) {
-        finishQuiz();
-        return;
-    }
+    if (!q) { finishQuiz(); return; }
 
-    // Options trong database nên để định dạng JSON: [{"text": "Dưới 200k", "value": "u200"}]
-    const optionsHtml = q.options.map(opt => `
-        <button onclick="handleSelect('${q.key}', '${opt.value}')">${opt.text}</button>
-    `).join("");
+    let options = q.options;
+    if (typeof options === 'string') options = JSON.parse(options);
 
-    quizBox.innerHTML = `
-        <div class="quiz-content animate-slide">
-            <h3>${q.question}</h3>
-            <div class="quiz-options-vertical">
-                ${optionsHtml}
-            </div>
-        </div>
-    `;
+    const optionsHtml = options.map(opt => 
+        `<button class="quiz-btn" onclick="handleSelect('${q.key}', '${opt.value}')">${opt.text}</button>`
+    ).join("");
+
+    qBox.innerHTML = `<h3>${q.question}</h3><div style="margin-top:20px;">${optionsHtml}</div>`;
 }
 
-function handleSelect(key, value) {
+window.handleSelect = (key, value) => {
     userChoices[key] = value;
     currentStep++;
-    if (currentStep < quizQuestions.length) {
-        renderStep();
-    } else {
-        finishQuiz();
-    }
-}
+    renderStep();
+};
 
 function finishQuiz() {
-    // Logic lọc sản phẩm dựa trên userChoices
+    // Lọc theo category hoặc tags
     const filtered = allProducts.filter(p => {
-        let match = true;
-        if (userChoices.category && p.category) {
-            match = p.category.toLowerCase().includes(userChoices.category.toLowerCase());
-        }
-        // Thêm các logic lọc giá hoặc tag tùy m muốn ở đây
-        return match;
+        const matchCat = !userChoices.category || p.category === userChoices.category;
+        return matchCat;
     });
 
-    if (shopEl) {
-        shopEl.innerHTML = filtered.length > 0 
-            ? filtered.map(renderCard).join("") 
-            : "<p>Lép tìm không ra món nào như ý m rồi... 🌿</p>";
+    const shopEl = document.getElementById("shop");
+    if (filtered.length > 0) {
+        shopEl.innerHTML = filtered.map(renderCard).join("");
+    } else {
+        shopEl.innerHTML = "<p style='grid-column: 1/-1;'>Hổng thấy món nào khớp hết, xem tạm mấy đồ này nha!</p>" + allProducts.slice(0, 4).map(renderCard).join("");
     }
     
     document.getElementById("quizBox").style.display = "none";
     shopEl.scrollIntoView({ behavior: 'smooth' });
 }
-/* --- 1. CẬP NHẬT TRẠNG THÁI & MÀU SẮC --- */
-async function loadSettings() {
-    try {
-        const { data: settings, error } = await supabaseClient.from("Settings").select("*");
-        if (error) throw error;
-        const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
 
-        // 1. Cập nhật Status (Kiểu mầm cây)
-        const statusEl = document.getElementById("display-status");
-        if (statusEl && config.status) {
-            statusEl.innerText = `💬 Lép nói: ${config.status}`;
-        }
-
-        // 2. Logic đổi màu web theo Mood (Màu lưu trong key 'user_mood')
-        if (config.user_mood) {
-            applyMoodColor(config.user_mood);
-        }
-        
-        // ... (giữ nguyên đoạn load Social Links của m)
-    } catch (err) { console.error("Lỗi:", err); }
+function setupWelcomeLogic() {
+    let visitCount = parseInt(localStorage.getItem("visit_count") || "0") + 1;
+    localStorage.setItem("visit_count", visitCount);
+    const welcomeEl = document.getElementById("welcome-msg");
+    if (welcomeEl && visitCount > 10) welcomeEl.innerText = "Lại là m à? Nghiện Lép rồi đúng không? 🙄";
 }
 
-// Hàm đổi màu toàn cục
-function applyMoodColor(mood) {
-    const colors = {
-        'happy': '#22c55e', // Xanh lá tươi
-        'sad': '#3b82f6',   // Xanh dương trầm
-        'angry': '#ef4444', // Đỏ xéo sắc
-        'chill': '#84cc16'  // Xanh chanh
-    };
-    const selectedColor = colors[mood] || '#22c55e';
-    document.documentElement.style.setProperty('--main-color', selectedColor);
-    // M nhớ trong CSS thay vì viết màu cứng, hãy dùng: color: var(--main-color);
-}
-/* --- 6. KHỞI CHẠY --- */
 init();

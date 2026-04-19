@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Lép Admin 🌱 Dashboard Xịn</title>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #5ed3c6;
@@ -89,10 +88,7 @@
         button.btn-danger { background: var(--danger); }
         button.btn-secondary { background: #95a5a6; }
 
-        .item-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
+        .item-list { max-height: 400px; overflow-y: auto; }
 
         .list-row {
             display: flex;
@@ -100,18 +96,6 @@
             align-items: center;
             padding: 15px;
             border-bottom: 1px solid #eee;
-            transition: 0.2s;
-        }
-
-        .list-row:hover { background: #f9f9f9; }
-
-        .tag-badge {
-            background: #e8f8f5;
-            color: var(--primary-dark);
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 11px;
-            margin-right: 5px;
         }
 
         #auth-overlay {
@@ -142,22 +126,27 @@
         <p id="stat-total-clicks">0</p>
     </div>
     <div class="stat-card">
-        <h4>Sản phẩm Hot nhất</h4>
+        <h4>Sản phẩm Hot</h4>
         <p id="stat-hot" style="font-size: 16px;">Đang tính...</p>
     </div>
 </div>
 
 <section>
-    <h3>1. Cấu hình Tiệm</h3>
+    <h3>1. Cấu hình Tiệm & Trạng thái</h3>
     <div class="grid-form">
         <input id="set-avatar" placeholder="Link ảnh Avatar">
         <input id="set-status" placeholder="Lép đang nói gì?">
+        <select id="set-mood">
+            <option value="happy">Vui vẻ (Xanh lá)</option>
+            <option value="sad">Trầm tư (Xanh dương)</option>
+            <option value="angry">Đang cọc (Đỏ)</option>
+        </select>
         <input id="set-fb" placeholder="Link FB">
         <input id="set-tiktok" placeholder="Link TikTok">
         <input id="set-mail" placeholder="Email">
     </div>
     <textarea id="set-bio" placeholder="Tiểu sử tiệm..." rows="2"></textarea>
-    <button onclick="updateSettings()">Cập nhật thông tin</button>
+    <button onclick="updateSettings()">Cập nhật thông tin & Trạng thái</button>
 </section>
 
 <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;">
@@ -167,14 +156,15 @@
             <input id="p-name" placeholder="Tên món đồ">
             <input id="p-price" type="number" placeholder="Giá (VND)">
             <input id="p-link" placeholder="Link Shopee/TikTok">
+            <input id="p-img" placeholder="Link ảnh sản phẩm">
             <select id="p-cat">
                 <option value="mỹ phẩm">Mỹ phẩm</option>
                 <option value="decor">Decor</option>
                 <option value="sách">Sách</option>
                 <option value="học tập">Học tập</option>
             </select>
+            <input id="p-tags" placeholder="Tags (ví dụ: mụn, da dầu)">
         </div>
-        <input id="p-tags" placeholder="Tags (ví dụ: mụn, da dầu, xinh)">
         <textarea id="p-desc" placeholder="Lép review món này thế nào?" rows="2"></textarea>
         <div class="btn-group">
             <button id="btn-save" onclick="addOrUpdateProduct()">Lưu món này</button>
@@ -185,262 +175,107 @@
     </section>
 
     <section>
-        <h3>3. Quản lý Quiz (Hệ thống Care)</h3>
-        <p style="font-size: 12px; color: #7f8c8d; margin-bottom: 10px;">* Thêm câu hỏi để khách tự động được tư vấn.</p>
-        <input id="q-step" type="number" placeholder="Thứ tự (1, 2, 3...)">
+        <h3>3. Quản lý Quiz</h3>
+        <input id="q-step" type="number" placeholder="Thứ tự (1, 2...)">
         <input id="q-text" placeholder="Nội dung câu hỏi?">
         <input id="q-key" placeholder="Key (ví dụ: category)">
-        <textarea id="q-options" placeholder='Định dạng: [{"text":"Mỹ phẩm","value":"beauty"}]' rows="3"></textarea>
-        <button onclick="saveQuiz()" style="width: 100%;">Lưu câu hỏi</button>
-        
+        <textarea id="q-options" placeholder='[{"text":"Mỹ phẩm","value":"beauty"}]' rows="3"></textarea>
+        <button onclick="saveQuiz()" style="width: 100%;">Thêm câu hỏi</button>
         <div class="item-list" id="quiz-list" style="margin-top: 20px;"></div>
     </section>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const supabaseClient = supabase.createClient(
-    "https://ebraxafpawypwmntoglw.supabase.co",
-    "sb_publishable_DhXag1beuBobuA8n4580Eg_hPUZJ9P0"
-);
+    const supabaseClient = supabase.createClient(
+        "https://ebraxafpawypwmntoglw.supabase.co",
+        "sb_publishable_DhXag1beuBobuA8n4580Eg_hPUZJ9P0"
+    );
 
-let products = [];
-let editingId = null;
+    let products = [];
+    let editingId = null;
+    const SETTINGS_TABLE = "Settings"; // Nhớ check lại trên Supabase xem chữ S viết hoa hay thường!
 
-async function checkAuth() {
-    const input = document.getElementById("pass-input").value;
-    const { data } = await supabaseClient.from("Settings").select("value").eq("key", "admin_password").maybeSingle();
-    if (data && input === data.value) {
-        localStorage.setItem("admin_auth", "true");
-        document.getElementById("auth-overlay").style.display = "none";
-        loadData();
-    } else { alert("Sai mật khẩu rồi mày!"); }
-}
+    // 1. Kiểm tra đăng nhập
+    async function checkAuth() {
+        const input = document.getElementById("pass-input").value;
+        const btn = document.querySelector("#auth-overlay button");
+        btn.innerText = "Đang kiểm tra...";
 
-if (localStorage.getItem("admin_auth") === "true") {
-    document.getElementById("auth-overlay").style.display = "none";
-    loadData();
-}
+        try {
+            const { data, error } = await supabaseClient
+                .from(SETTINGS_TABLE)
+                .select("value")
+                .eq("key", "admin_password")
+                .maybeSingle();
 
-async function loadData() {
-    // Load Settings
-    // Thêm dòng này vào đầu hàm loadData() trong file Admin
-    async function loadData() {
-        if (localStorage.getItem("admin_auth") !== "true") {
-            document.getElementById("auth-overlay").style.display = "flex";
-            return; // Dừng luôn không cho load dữ liệu bên dưới
+            if (error) throw error;
+            const correctPass = data ? data.value : "admin"; 
+
+            if (input === correctPass) {
+                localStorage.setItem("admin_auth", "true");
+                document.getElementById("auth-overlay").style.display = "none";
+                loadData();
+            } else {
+                alert("Mật mã sai! Cút!");
+                btn.innerText = "Vào tiệm";
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Lỗi kết nối rồi m!");
+            btn.innerText = "Thử lại";
         }
-    // ... code load data cũ
-    }
-    const { data: settings } = await supabaseClient.from("Settings").select("*");
-    if (settings) {
-        const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
-        document.getElementById("set-avatar").value = config.avatar || "";
-        document.getElementById("set-bio").value = config.bio || "";
-        document.getElementById("set-status").value = config.status || "";
-        document.getElementById("set-fb").value = config.fb_link || "";
-        document.getElementById("set-tiktok").value = config.tiktok_link || "";
-        document.getElementById("set-mail").value = config.email || "";
     }
 
-    // Load Products & Stats
-    const { data } = await supabaseClient.from("products").select("*").order("clicks", { ascending: false });
-    products = data || [];
-    renderProducts();
-    updateStats();
+    // Tự động vào nếu có session
+    window.onload = () => {
+        if (localStorage.getItem("admin_auth") === "true") {
+            document.getElementById("auth-overlay").style.display = "none";
+            loadData();
+        }
+    };
 
-    // Load Quiz
-    loadQuizData();
-}
+    // 2. Load dữ liệu (Mày dán tiếp các hàm loadData, renderProducts... của mày vào dưới này)
+    async function loadData() {
+        const { data: settings } = await supabaseClient.from(SETTINGS_TABLE).select("*");
+        if (settings) {
+            const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
+            document.getElementById("set-avatar").value = config.avatar || "";
+            document.getElementById("set-bio").value = config.bio || "";
+            document.getElementById("set-status").value = config.status || "";
+            document.getElementById("set-mood").value = config.user_mood || "happy";
+            document.getElementById("set-fb").value = config.fb_link || "";
+            document.getElementById("set-tiktok").value = config.tiktok_link || "";
+            document.getElementById("set-mail").value = config.email || "";
+        }
 
-function updateStats() {
-    const totalP = products.length;
-    const totalClicks = products.reduce((sum, p) => sum + (p.clicks || 0), 0);
-    const hotP = products.length > 0 ? products[0].name : "Chưa có";
+        const { data: pData } = await supabaseClient.from("products").select("*").order("clicks", { ascending: false });
+        products = pData || [];
+        renderProducts();
+        updateStats();
+        loadQuizData();
+    }
+
+    // ... (Giữ lại các hàm renderProducts, addOrUpdateProduct, saveQuiz giống file cũ của mày)
     
-    document.getElementById("stat-total-p").innerText = totalP;
-    document.getElementById("stat-total-clicks").innerText = totalClicks;
-    document.getElementById("stat-hot").innerText = hotP;
-}
-
-function renderProducts() {
-    document.getElementById("product-list").innerHTML = products.map(p => `
-        <div class="list-row">
-            <div>
-                <strong>${p.name}</strong> <span style="color:#95a5a6; font-size:12px;">#${p.category}</span><br>
-                <span style="color:var(--danger); font-size:12px; font-weight:700;">🔥 ${p.clicks || 0} clicks</span>
-            </div>
-            <div>
-                <button onclick="editProduct('${p.id}')" style="padding: 5px 10px; font-size:12px;">Sửa</button>
-                <button class="btn-danger" onclick="deleteProduct('${p.id}')" style="padding: 5px 10px; font-size:12px;">Xoá</button>
-            </div>
-        </div>
-    `).join("");
-}
-
-// Logic cho Quiz (No-code)
-async function loadQuizData() {
-    const { data } = await supabaseClient.from("quizzes").select("*").order("step", { ascending: true });
-    if (data) {
-        document.getElementById("quiz-list").innerHTML = data.map(q => `
-            <div class="list-row" style="font-size:13px;">
-                <span><b>B${q.step}:</b> ${q.question}</span>
-                <button class="btn-danger" onclick="deleteQuiz('${q.id}')" style="max-width:50px; padding:2px;">Xoá</button>
+    function renderProducts() {
+        document.getElementById("product-list").innerHTML = products.map(p => `
+            <div class="list-row">
+                <div>
+                    <strong>${p.name}</strong> <small>#${p.category}</small><br>
+                    <span style="color:var(--danger); font-size:12px;">🔥 ${p.clicks || 0} clicks</span>
+                </div>
+                <div>
+                    <button onclick="editProduct('${p.id}')" style="padding: 5px; font-size:11px;">Sửa</button>
+                    <button class="btn-danger" onclick="deleteProduct('${p.id}')" style="padding: 5px; font-size:11px;">Xoá</button>
+                </div>
             </div>
         `).join("");
     }
-}
+    
+    // (Copy nốt các hàm còn thiếu từ file cũ dán vào đây trước khi đóng thẻ script)
 
-async function saveQuiz() {
-    const step = document.getElementById("q-step").value;
-    const question = document.getElementById("q-text").value;
-    const key = document.getElementById("q-key").value;
-    const options = JSON.parse(document.getElementById("q-options").value);
-
-    await supabaseClient.from("quizzes").insert([{ step, question, key, options }]);
-    alert("Đã thêm câu hỏi!");
-    loadQuizData();
-}
-
-async function deleteQuiz(id) {
-    if(confirm("Xoá câu hỏi này?")) {
-        await supabaseClient.from("quizzes").delete().eq("id", id);
-        loadQuizData();
-    }
-}
-
-// ... Các hàm addOrUpdateProduct, editProduct, deleteProduct giữ nguyên logic cũ 
-// nhưng nhớ đổi 'click_count' thành 'clicks' trong code của mày nhé!
-
-async function addOrUpdateProduct() {
-    const name = document.getElementById("p-name").value;
-    const price = parseInt(document.getElementById("p-price").value);
-    const link = document.getElementById("p-link").value;
-    const category = document.getElementById("p-cat").value;
-    const tags = document.getElementById("p-tags").value.split(",").map(t => t.trim());
-    const review = document.getElementById("p-desc").value;
-
-    const payload = { name, price, link, category, tags, review };
-
-    if (editingId) {
-        await supabaseClient.from("products").update(payload).eq("id", editingId);
-    } else {
-        await supabaseClient.from("products").insert([{ ...payload, clicks: 0 }]);
-    }
-    cancelEdit();
-    loadData();
-}
-
-function editProduct(id) {
-    const p = products.find(x => x.id == id);
-    if (!p) return;
-    editingId = id;
-    document.getElementById("p-name").value = p.name;
-    document.getElementById("p-price").value = p.price || "";
-    document.getElementById("p-link").value = p.link;
-    document.getElementById("p-cat").value = p.category;
-    document.getElementById("p-tags").value = p.tags ? p.tags.join(",") : "";
-    document.getElementById("p-desc").value = p.review || "";
-    document.getElementById("btn-cancel").style.display = "inline-block";
-    document.getElementById("btn-save").innerText = "Cập nhật";
-}
-
-function cancelEdit() {
-    editingId = null;
-    ["p-name", "p-price", "p-link", "p-tags", "p-desc"].forEach(id => document.getElementById(id).value = "");
-    document.getElementById("btn-cancel").style.display = "none";
-    document.getElementById("btn-save").innerText = "Lưu món này";
-}
-
-async function deleteProduct(id) {
-    if (confirm("Xoá hả m?")) {
-        await supabaseClient.from("products").delete().eq("id", id);
-        loadData();
-    }
-}
-
-async function updateSettings() {
-    const s = {
-        avatar: document.getElementById("set-avatar").value,
-        bio: document.getElementById("set-bio").value,
-        status: document.getElementById("set-status").value,
-        fb_link: document.getElementById("set-fb").value,
-        tiktok_link: document.getElementById("set-tiktok").value,
-        email: document.getElementById("set-mail").value
-    };
-    for (const [key, value] of Object.entries(s)) {
-        await supabaseClient.from("Settings").upsert({ key, value });
-    }
-    alert("Lưu rồi nhé!");
-}
-// Thêm ô nhập link ảnh vào form sản phẩm ở phần HTML
-// <input id="p-img" placeholder="Link ảnh sản phẩm (URL)">
-
-async function checkAuth() {
-    const input = document.getElementById("pass-input").value;
-    try {
-        const { data, error } = await supabaseClient.from("Settings").select("value").eq("key", "admin_password").maybeSingle();
-        // Nếu DB chưa có pass, cho phép 'admin' là pass mặc định để m vào thiết lập
-        const correctPass = data ? data.value : "admin"; 
-        
-        if (input === correctPass) {
-            localStorage.setItem("admin_auth", "true");
-            document.getElementById("auth-overlay").style.display = "none";
-            loadData();
-        } else {
-            alert("Sai mật khẩu rồi mày!");
-        }
-    } catch (e) {
-        alert("Lỗi kết nối: " + e.message);
-    }
-}
-
-async function addOrUpdateProduct() {
-    const name = document.getElementById("p-name").value;
-    const price = parseInt(document.getElementById("p-price").value);
-    const link = document.getElementById("p-link").value;
-    const image = document.getElementById("p-img").value; // Lấy link ảnh
-    const category = document.getElementById("p-cat").value;
-    const tags = document.getElementById("p-tags").value.split(",").map(t => t.trim());
-    const review = document.getElementById("p-desc").value;
-
-    const payload = { name, price, link, image, category, tags, review };
-
-    if (editingId) {
-        await supabaseClient.from("products").update(payload).eq("id", editingId);
-    } else {
-        await supabaseClient.from("products").insert([{ ...payload, clicks: 0 }]);
-    }
-    alert("Xong rồi!");
-    cancelEdit();
-    loadData();
-}
-async function updateStatus() {
-    const content = document.getElementById("new-status").value;
-    const mood = document.getElementById("mood-select").value;
-
-    // Cập nhật lên Supabase (Bảng Settings)
-    const { error } = await supabaseClient.from("Settings").upsert([
-        { key: 'status', value: content },
-        { key: 'user_mood', value: mood }
-    ]);
-
-    if (!error) {
-        alert("Đã đăng! Ra trang chủ mà xem thành quả.");
-        location.reload();
-    }
-}
-<div class="admin-section">
-    <h3>Đăng Status cho Lép</h3>
-    <textarea id="new-status" placeholder="Hôm nay m thấy thế nào?"></textarea>
-    <select id="mood-select">
-        <option value="happy">Vui (Web xanh tươi)</option>
-        <option value="sad">Hơi buồn (Web trầm xuống)</option>
-        <option value="angry">Đang cọc (Web đỏ xéo sắc)</option>
-    </select>
-    <button onclick="updateStatus()">Lên sóng ngay</button>
-</div>
-<input id="p-img" placeholder="Link ảnh sản phẩm (URL)">
 </script>
+
 </body>
 </html>

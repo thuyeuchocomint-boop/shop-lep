@@ -3,83 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LÉP LÀ LEAF 🌱 - Tiệm Đồ Của Lép</title>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
+    <title>Lép là Leaf 🌱 Tiệm nhỏ của Lép</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --main-color: #22c55e;
+            --bg-light: #f0fdf4;
+            --text-dark: #1f2937;
+        }
 
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0; padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        #display-avatar {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--main-color);
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        #social-links {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 14px;
+        }
+
+        #social-links span { display: none; } /* Mặc định ẩn, JS sẽ hiện khi có data */
+
+        #social-links a {
+            text-decoration: none;
+            color: var(--main-color);
+            font-weight: bold;
+        }
+
+        #status-area {
+            display: none;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        #display-status {
+            background: var(--main-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .container { max-width: 800px; margin: 20px auto; padding: 0 20px; }
+
+        #quizBox {
+            background: white; padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: none;
+            text-align: center;
+        }
+
+        .quiz-btn {
+            background: white; border: 2px solid var(--main-color);
+            color: var(--main-color);
+            padding: 10px 20px; margin: 5px;
+            border-radius: 10px; cursor: pointer;
+            font-weight: 600; transition: 0.2s;
+        }
+
+        .quiz-btn:hover { background: var(--main-color); color: white; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white; border-radius: 15px;
+            overflow: hidden; position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: 0.3s; text-align: center;
+            padding-bottom: 15px;
+        }
+
+        .category-tag {
+            position: absolute; top: 0; left: 0;
+            background: var(--main-color); color: white;
+            font-size: 10px; padding: 2px 8px;
+            border-radius: 0 0 10px 0;
+            text-transform: uppercase;
+        }
+
+        .card img { width: 100%; height: 150px; object-fit: cover; }
+        .card h4 { margin: 10px 0; font-size: 14px; padding: 0 10px; }
+        .price { color: var(--main-color); font-weight: 700; margin-bottom: 10px; }
+        button.go-btn {
+            background: var(--main-color); color: white;
+            border: none; padding: 8px 20px;
+            border-radius: 8px; cursor: pointer; font-weight: 600;
+        }
+    </style>
+</head>
 <body>
 
-    <header class="profile-section">
-        <div class="avatar-wrap">
-            <img id="display-avatar" src="avatar-default.webp" class="avatar-img" alt="Lép" loading="eager">
-        </div>
-
-        <h1 id="display-name">Lép là Leaf 🌱</h1>
-        <p id="display-bio">Đang chuẩn bị đồ cho m...</p>
-        
-        <p id="display-email" class="user-email"></p>
-        <div id="display-status" class="status-bubble"></div>
-        <div class="social-links">
-          <a id="link-fb_link" href="#" target="_blank">Facebook</a>
-          <a id="link-ig_link" href="#" target="_blank">Instagram</a>
-          <a id="link-tiktok_link" href="#" target="_blank">TikTok</a>
-          <a id="link-threads_link" href="#" target="_blank">Threads</a>
-
-        </div>
-
-        <div id="welcome-msg" class="welcome-text"></div>
-    </header>
-
-    <section class="section">
-        <h2 class="section-title">🛍️ Danh mục sản phẩm</h2>
-        <div class="category-container">
-            <div class="filter-group">
-                <button class="cat-btn active" onclick="filterProducts('all', this)">Tất cả</button>
-                <button class="cat-btn" onclick="filterProducts('mỹ phẩm', this)">Mỹ phẩm</button>
-                <button class="cat-btn" onclick="filterProducts('quần áo', this)">Quần áo</button>
-                <button class="cat-btn" onclick="filterProducts('decor', this)">Decor</button>
-                <button class="cat-btn" onclick="filterProducts('sách', this)">Sách</button>
-                <button class="cat-btn" onclick="filterProducts('học tập', this)">Học tập</button>
-            </div>
-        </div>
-        <h3 id="filter-title" class="filter-status-text"></h3>
-    </section>
-
-    <section class="section">
-        <div class="section-header">
-            <h2 class="section-title">🔥 Lép khuyên m dùng</h2>
-        </div>
-        <div id="recommend-loading" class="grid-container">
-            <div class="card skeleton"></div>
-            <div class="card skeleton"></div>
-        </div>
-        <div id="recommend" class="grid-container"></div>
-    </section>
-
-    <section class="section">
-        <div class="section-header">
-            <h2 class="section-title">🌱 Tiệm đồ nhà Lép</h2>
-        </div>
-        <div id="shop-loading" class="grid-container">
-            <div class="card skeleton"></div>
-            <div class="card skeleton"></div>
-            <div class="card skeleton"></div>
-        </div>
-        <div id="shop" class="grid-container"></div>
-    </section>
-
-    <div class="lep-fixed-wrap" onclick="showQuiz()" title="Nhờ Lép tư vấn">
-        <img src="lep-idle.webp" class="lep-base" alt="Lép Mascot">
-        <img src="lep-blink.webp" class="lep-blink" alt="Lép nháy mắt">
-        <div class="chat-hint">Cần tư vấn thì ấn vào t!</div>
+<header>
+    <img id="display-avatar" src="https://via.placeholder.com/150" alt="Lép">
+    <h2 id="welcome-msg">Chào m đến với tiệm của Lép 🌱</h2>
+    
+    <div id="gmail-wrapper" style="margin: 10px 0; font-size: 14px; font-weight: 600; color: var(--text-dark);">
+        📧 Email: <span id="display-gmail">đang tải...</span>
     </div>
 
-    <div id="quizBox" class="quiz-card" style="display:none;">
+    <div id="social-links-container" class="social-links" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
         </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="scripts.js"></script>
+    <div id="status-area" style="margin-top: 15px; display: none; justify-content: center;">
+        <span id="display-status">💬 Lép đang ngủ...</span>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button class="quiz-btn" onclick="showQuiz()">🔍 Tìm đồ cho t</button>
+    </div>
+</header>
+        <span id="display-status">💬 Lép đang ngủ...</span>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button class="quiz-btn" onclick="showQuiz()">🔍 Tìm đồ cho t</button>
+    </div>
+</header>
+
+<div class="container">
+    <div id="quizBox">
+        <p>Đang chuẩn bị câu hỏi...</p>
+    </div>
+
+    <h3 style="border-left: 4px solid var(--main-color); padding-left: 10px;">Gợi ý cho m:</h3>
+    <div id="recommend" class="grid"></div>
+
+    <h3 style="border-left: 4px solid var(--main-color); padding-left: 10px; margin-top: 40px;">Tất cả đồ xịn:</h3>
+    <div id="shop" class="grid">
+        <p id="shop-loading">Đang tải sản phẩm...</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="scripts.js"></script>
+
+<script>
+    let clicks = 0;
+    document.getElementById("display-avatar").onclick = () => {
+        clicks++;
+        if (clicks === 5) window.location.href = "admin.html";
+    };
+</script>
 
 </body>
 </html>

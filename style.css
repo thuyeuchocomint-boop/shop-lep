@@ -1,5 +1,45 @@
 /* --- 1. BIẾN & THIẾT LẬP GỐC --- */
 :root {
+    --main-color: #22c55e; /* Màu mặc định của Lép */
+    --bg-light: #f0fdf4;
+}
+
+body {
+    background-color: var(--bg-light);
+    transition: background-color 0.5s ease; /* Hiệu ứng đổi màu cho mượt */
+}
+
+/* Các class m đang dùng, hãy thay màu cứng bằng biến này */
+.card h4, .price, #welcome-msg b, .quiz-content h3 {
+    color: var(--main-color);
+}
+
+.btn-go, button {
+    background-color: var(--main-color);
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* Style cho khung Status */
+.status-box {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid var(--main-color);
+    border-radius: 15px;
+    padding: 15px;
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+#display-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+:root {
     --primary: #5ed3c6; /* Xanh lá đặc trưng của Lép */
     --primary-dark: #48b4a9;
     --bg-gradient: linear-gradient(135deg, #f7fafa 0%, #eef6f5 100%);
