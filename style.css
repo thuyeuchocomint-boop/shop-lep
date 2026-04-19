@@ -1,9 +1,47 @@
 /* --- 1. BIẾN & THIẾT LẬP GỐC --- */
 :root {
-    --main-color: #22c55e; /* Màu mặc định của Lép */
+    --main-color: #22c55e; 
     --bg-light: #f0fdf4;
 }
 
+/* Đổi màu để TỐT cho tâm trạng chứ không giống tâm trạng */
+body.mood-happy { 
+    --main-color: #22c55e; 
+    --bg-light: #f0fdf4; 
+} /* Giữ xanh lá để khách tiếp tục vui */
+
+body.mood-sad { 
+    --main-color: #ff9a9e; 
+    --bg-light: #fff0f0; 
+} /* Dùng tông hồng ấm để an ủi nỗi buồn */
+
+body.mood-angry { 
+    --main-color: #00cec9; 
+    --bg-light: #e0fcfc; 
+} /* Dùng xanh mint/nước biển để hạ hỏa cơn giận */
+
+body {
+    background: var(--bg-light);
+    background-attachment: fixed; /* Giữ nền ổn định khi cuộn */
+    transition: all 0.8s ease; /* Chuyển màu chậm hơn chút cho khách thấy nhẹ nhàng */
+}
+
+/* Các lớp hỗ trợ đổi màu nhanh qua JS */
+body.mood-happy { --main-color: #22c55e; --bg-light: #f0fdf4; }
+body.mood-sad { --main-color: #3b82f6; --bg-light: #eff6ff; }
+body.mood-angry { --main-color: #ef4444; --bg-light: #fef2f2; }
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    transition: all 0.5s ease; /* Hiệu ứng chuyển màu mượt */
+}
+
+/* Cập nhật các thành phần dùng màu biến */
+.card h4, .price, #welcome-msg b { color: var(--main-color); }
+.go-btn, .quiz-btn, #display-status { background-color: var(--main-color) !important; color: white !important; }
+.quiz-btn { border: 2px solid var(--main-color); background: white !important; color: var(--main-color) !important; }
+.quiz-btn:hover { background: var(--main-color) !important; color: white !important; }
 body {
     background-color: var(--bg-light);
     transition: background-color 0.5s ease; /* Hiệu ứng đổi màu cho mượt */
@@ -483,4 +521,49 @@ a, button {
 @keyframes floating {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
+}
+/* --- HỆ THỐNG MÀU TRỊ LIỆU CỦA LÉP --- */
+:root {
+    --main-color: #22c55e; /* Xanh lá mặc định */
+    --bg-light: #f0fdf4;
+}
+
+/* 1. Khi khách chọn Vui vẻ: Giữ tone xanh lá tươi mới */
+body.mood-happy { 
+    --main-color: #22c55e; 
+    --bg-light: #f0fdf4; 
+}
+
+/* 2. Khi khách chọn Buồn: Đổi sang Hồng ấm áp để an ủi */
+body.mood-sad { 
+    --main-color: #ff9a9e; 
+    --bg-light: #fff0f0; 
+}
+
+/* 3. Khi khách chọn Cọc/Stress: Đổi sang Xanh Mint cho mát máu */
+body.mood-angry { 
+    --main-color: #00cec9; 
+    --bg-light: #e0fcfc; 
+}
+
+/* --- ÁP DỤNG MÀU VÀO CÁC THÀNH PHẦN --- */
+body {
+    background-color: var(--bg-light) !important;
+    transition: all 0.8s ease; /* Hiệu ứng chuyển màu mượt mà */
+}
+
+/* Nút bấm và các thành phần chính sẽ tự đổi màu theo biến trên */
+.go-btn, .quiz-btn, #display-status {
+    background-color: var(--main-color) !important;
+    color: white !important;
+}
+
+#welcome-msg b, .price, .category-tag {
+    color: var(--main-color) !important;
+}
+
+.quiz-btn {
+    border: 2px solid var(--main-color) !important;
+    background: white !important;
+    color: var(--main-color) !important;
 }
