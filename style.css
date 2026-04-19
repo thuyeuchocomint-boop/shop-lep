@@ -1,4 +1,4 @@
-/* --- TỔNG QUAN --- */
+/* --- 1. CÀI ĐẶT CHUNG --- */
 * {
     margin: 0;
     padding: 0;
@@ -7,107 +7,141 @@
 }
 
 body {
-    /* Background màu loang nhẹ, không gây lỗi */
-    background: #fdfbfb;
-    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-    background-attachment: fixed;
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    max-width: 480px; 
-    margin: 0 auto;
-    padding: 20px 15px 120px 15px;
-    min-height: 100vh;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto; 
+    padding: 20px;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    padding-bottom: 120px;
 }
 
-/* --- PHÂN LOẠI (Hết lỗi không vuốt được trên PC) --- */
-.category-container {
-    width: 100%;
-    overflow-x: auto; 
-    padding: 10px 0;
-    margin-bottom: 20px;
-    scrollbar-width: thin; /* Cho Firefox */
+/* --- 2. PROFILE --- */
+.profile-section {
+    text-align: center;
+    margin-bottom: 25px;
 }
 
-/* Hiện thanh cuộn cho PC dễ dùng */
-.category-container::-webkit-scrollbar { height: 4px; }
-.category-container::-webkit-scrollbar-thumb { background: #5ed3c6; border-radius: 10px; }
-
-.category-filter {
-    display: flex;
-    gap: 10px;
+.avatar-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #5ed3c6;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.cat-btn {
-    flex: 0 0 auto;
-    padding: 8px 18px;
-    border-radius: 20px;
+.social-links a {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 5px;
+    background: #fff;
     border: 1px solid #5ed3c6;
-    background: white;
+    border-radius: 20px;
+    text-decoration: none;
     color: #5ed3c6;
+    font-size: 14px;
     font-weight: 600;
-    cursor: pointer;
 }
 
-.cat-btn.active {
-    background: #5ed3c6;
-    color: white;
+/* Thêm cho Gmail đỡ bị lỗi */
+.mail-link {
+    display: block;
+    margin: 10px 0;
+    color: #7f8c8d;
+    text-decoration: none;
+    font-size: 14px;
 }
 
-/* --- GRID SẢN PHẨM --- */
+/* --- 3. SẢN PHẨM --- */
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
+    margin-top: 20px;
 }
 
 .card {
-    background: white;
-    border-radius: 15px;
-    padding: 10px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
 
 .card img {
     width: 100%;
+    border-radius: 8px;
     aspect-ratio: 1/1;
     object-fit: cover;
-    border-radius: 10px;
+    margin-bottom: 10px;
 }
 
-/* --- CON LÉP (Fix icon ảnh lỗi & Vị trí) --- */
+.card a {
+    display: block;
+    background: linear-gradient(135deg, #5ed3c6 0%, #48b4a9 100%);
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px 0;
+    border-radius: 25px;
+}
+
+/* --- 4. CON LÉP --- */
 .lep-wrap {
     position: fixed;
     bottom: 20px;
-    right: calc(50% - 230px); /* Bám lề khung 480px */
-    width: 90px;
-    height: 90px;
+    right: 20px;
+    width: 75px; 
+    height: 75px;
     z-index: 9999;
-    pointer-events: none;
-}
-
-@media (max-width: 500px) {
-    .lep-wrap { right: 10px; }
 }
 
 .lep-base, .lep-blink {
     width: 100%;
     height: 100%;
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     object-fit: contain;
 }
 
-/* Nếu ảnh lỗi thì không hiện khung icon trắng */
-img:not([src]) { visibility: hidden; }
-
 .lep-blink {
-    z-index: 2;
-    animation: blink-anim 4s steps(1) infinite;
+    animation: blink-anim 3s steps(1) infinite;
 }
 
 @keyframes blink-anim {
     0%, 90% { opacity: 0; }
-    92%, 95% { opacity: 1; }
-    97%, 100% { opacity: 0; }
+    91%, 100% { opacity: 1; }
+}
+
+/* Thanh danh mục */
+.category-container {
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+    padding: 10px 0;
+}
+
+.category-filter {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+}
+
+.cat-btn {
+    flex: 0 0 auto;
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: 1.5px solid #5ed3c6;
+    background: #fff;
+    color: #5ed3c6;
+    font-weight: 600;
+}
+
+.cat-btn.active {
+    background: #5ed3c6;
+    color: #fff;
 }
