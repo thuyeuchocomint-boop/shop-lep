@@ -1,4 +1,4 @@
-/* --- 1. RESET & NỀN WEB (BACKGROUND) --- */
+/* --- TỔNG QUAN --- */
 * {
     margin: 0;
     padding: 0;
@@ -7,127 +7,43 @@
 }
 
 body {
-    /* Màu loang nhẹ nhàng m muốn đây */
+    /* Background màu loang nhẹ, không gây lỗi */
+    background: #fdfbfb;
     background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
     background-attachment: fixed;
-    color: #333;
-    line-height: 1.6;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    
-    /* ÉP GIAO DIỆN VÀO GIỮA (FIX LỖI LAPTOP) */
+    font-family: 'Segoe UI', Tahoma, sans-serif;
     max-width: 480px; 
-    margin: 0 auto; 
+    margin: 0 auto;
+    padding: 20px 15px 120px 15px;
     min-height: 100vh;
-    padding: 20px;
-    padding-bottom: 100px; /* Chừa chỗ cho con Lép */
-    box-shadow: 0 0 20px rgba(0,0,0,0.05); /* Tạo viền mờ cho đẹp trên Laptop */
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
 }
 
-/* --- 2. PROFILE SECTION --- */
-.profile-section {
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-.avatar-img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #5ed3c6;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-#display-name {
-    font-size: 1.4rem;
-    color: #2c3e50;
-    margin-bottom: 5px;
-}
-
-#display-bio {
-    font-size: 0.9rem;
-    color: #7f8c8d;
-    margin-bottom: 10px;
-}
-
-/* LINK GMAIL */
-.mail-link {
-    display: inline-block;
-    font-size: 0.85rem;
-    color: #666;
-    background: white;
-    padding: 5px 15px;
-    border-radius: 20px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-/* THANH TIN TỨC (ANNOUNCEMENT) - FIX LỖI "HIHI" */
-.news-flash {
-    background: #fff9db;
-    border-left: 5px solid #ffec99;
-    color: #856404;
-    padding: 12px;
-    border-radius: 10px;
-    margin: 15px 0;
-    font-size: 0.9rem;
-    text-align: center;
-}
-
-/* CÁC NÚT SOCIAL */
-.social-links {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.social-links a {
-    background: white;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #5ed3c6;
-    border: 1px solid #5ed3c6;
-    transition: 0.3s;
-}
-
-.social-links a:hover {
-    background: #5ed3c6;
-    color: white;
-}
-
-/* BONG BÓNG CHAT CỦA LÉP */
-.status-bubble {
-    background: white;
-    padding: 10px 15px;
-    border-radius: 15px 15px 15px 2px;
-    font-size: 0.85rem;
-    display: inline-block;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    margin-bottom: 10px;
-}
-
-/* --- 3. CATEGORY & GRID SẢN PHẨM --- */
+/* --- PHÂN LOẠI (Hết lỗi không vuốt được trên PC) --- */
 .category-container {
-    overflow-x: auto;
-    white-space: nowrap;
-    padding-bottom: 10px;
+    width: 100%;
+    overflow-x: auto; 
+    padding: 10px 0;
     margin-bottom: 20px;
-    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin; /* Cho Firefox */
 }
 
-.category-container::-webkit-scrollbar { display: none; }
+/* Hiện thanh cuộn cho PC dễ dùng */
+.category-container::-webkit-scrollbar { height: 4px; }
+.category-container::-webkit-scrollbar-thumb { background: #5ed3c6; border-radius: 10px; }
+
+.category-filter {
+    display: flex;
+    gap: 10px;
+}
 
 .cat-btn {
+    flex: 0 0 auto;
     padding: 8px 18px;
     border-radius: 20px;
     border: 1px solid #5ed3c6;
     background: white;
     color: #5ed3c6;
-    margin-right: 5px;
     font-weight: 600;
     cursor: pointer;
 }
@@ -137,9 +53,10 @@ body {
     color: white;
 }
 
+/* --- GRID SẢN PHẨM --- */
 .grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Luôn chia 2 cột cho đều */
+    grid-template-columns: 1fr 1fr;
     gap: 15px;
 }
 
@@ -147,9 +64,8 @@ body {
     background: white;
     border-radius: 15px;
     padding: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
     text-align: center;
-    transition: 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
 
 .card img {
@@ -157,50 +73,41 @@ body {
     aspect-ratio: 1/1;
     object-fit: cover;
     border-radius: 10px;
-    margin-bottom: 8px;
 }
 
-.card h4 { font-size: 0.85rem; margin-bottom: 5px; height: 35px; overflow: hidden; }
-
-.card a {
-    display: block;
-    background: #5ed3c6;
-    color: white;
-    padding: 8px;
-    border-radius: 10px;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-/* --- 4. CON LÉP ANIMATION (FIX CHE ĐỒ) --- */
+/* --- CON LÉP (Fix icon ảnh lỗi & Vị trí) --- */
 .lep-wrap {
     position: fixed;
     bottom: 20px;
-    right: calc(50% - 220px); /* Bám theo mép phải khung 480px trên Laptop */
-    width: 80px;
-    height: 80px;
+    right: calc(50% - 230px); /* Bám lề khung 480px */
+    width: 90px;
+    height: 90px;
     z-index: 9999;
-    pointer-events: none; /* Khách bấm xuyên qua con Lép được */
+    pointer-events: none;
 }
 
-/* Trên Mobile thì cho nó sát lề phải */
 @media (max-width: 500px) {
-    .lep-wrap {
-        right: 10px;
-    }
+    .lep-wrap { right: 10px; }
 }
 
 .lep-base, .lep-blink {
     width: 100%;
+    height: 100%;
     position: absolute;
     top: 0; left: 0;
+    object-fit: contain;
 }
 
+/* Nếu ảnh lỗi thì không hiện khung icon trắng */
+img:not([src]) { visibility: hidden; }
+
 .lep-blink {
-    animation: blink-anim 3s steps(1) infinite;
+    z-index: 2;
+    animation: blink-anim 4s steps(1) infinite;
 }
 
 @keyframes blink-anim {
     0%, 90% { opacity: 0; }
-    91%, 100% { opacity: 1; }
+    92%, 95% { opacity: 1; }
+    97%, 100% { opacity: 0; }
 }
