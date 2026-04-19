@@ -37,7 +37,7 @@ async function initShopeeMini() {
 
   if (visitCount === 0 && history.length === 0) {
     // 1. Khách mới tinh
-    welcomeEl.innerHTML = "Chào m! Lần đầu ghé tiệm Lép à? Xem đồ đi, không mua t khinh.";
+    welcomeEl.innerHTML = "Chào m! Lần đầu ghé tiệm Lép à? Xem đồ đi, ok lắm ^.^";
   } else {
     // 2. Khách cũ - Tìm sở thích (Danh mục xem nhiều nhất)
     const categories = history.map(h => h.category).filter(Boolean);
@@ -52,9 +52,9 @@ async function initShopeeMini() {
       welcomeEl.innerHTML = `Quay lại rồi à? Nhìn m là biết vẫn đang mê mấy món <b>${favoriteCat}</b> rồi!`;
     } else if (history.length > 0) {
       const lastItem = history[history.length - 1].name;
-      welcomeEl.innerHTML = `Vẫn đang tia cái <b>${lastItem}</b> à? Mua lẹ đi cho t nhờ!`;
+      welcomeEl.innerHTML = `Vẫn đang tia cái <b>${lastItem}</b> à? Mua lẹ đi !^^`;
     } else {
-      welcomeEl.innerHTML = "Lại là m à? Lần này định mua thật hay lại vào ngó rồi đi ra?";
+      welcomeEl.innerHTML = "Lại là m à? Lần này định vào ngó gì nào?";
     }
   }
 }

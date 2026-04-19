@@ -152,7 +152,21 @@ body {
     scrollbar-color: #5ed3c6 #f0f0f0;
 }
 
-/* Hiện thanh cuộn trên Chrome/Safari để dùng chuột kéo được */
+
+
+/* Khung bọc ngoài cùng */
+.category-container {
+    width: 100%;
+    display: flex;
+    overflow-x: auto; /* Cho phép cuộn ngang */
+    gap: 12px;        /* TẠO KHOẢNG CÁCH GIỮA CÁC NÚT - KHÔNG BỊ DÍNH */
+    padding: 15px 5px;
+    margin-bottom: 10px;
+    -webkit-overflow-scrolling: touch; /* Vuốt cực mượt trên điện thoại */
+    scrollbar-width: thin; /* Hiện thanh cuộn mỏng cho máy tính */
+}
+
+/* Làm thanh cuộn đẹp hơn trên Chrome/Edge để dùng chuột kéo được */
 .category-container::-webkit-scrollbar {
     height: 4px;
 }
@@ -161,19 +175,24 @@ body {
     border-radius: 10px;
 }
 
+/* Định dạng từng nút bấm danh mục */
 .cat-btn {
-    flex: 0 0 auto; /* Không cho nút bị co lại */
+    flex-shrink: 0;      /* QUAN TRỌNG: Không cho nút bị bóp méo hay dính nhau */
+    white-space: nowrap; /* Không cho chữ bị xuống dòng */
     padding: 8px 18px;
     border-radius: 20px;
-    border: 1px solid #5ed3c6;
+    border: 1.5px solid #5ed3c6;
     background: #fff;
     color: #5ed3c6;
     font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.2s ease;
 }
 
+/* Khi nút được bấm vào (Active) */
 .cat-btn.active {
     background: #5ed3c6;
     color: #fff;
+    box-shadow: 0 4px 10px rgba(94, 211, 198, 0.3);
 }
