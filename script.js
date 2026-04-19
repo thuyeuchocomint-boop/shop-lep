@@ -16,49 +16,59 @@ async function initShopeeMini() {
 
   const config = Object.fromEntries(settings.map(s => [s.key, s.value]));
 
+  // Đổ dữ liệu cơ bản
   if (config.avatar) document.getElementById("display-avatar").src = config.avatar;
   if (config.bio) document.getElementById("display-bio").innerText = config.bio;
   if (config.status) document.getElementById("display-status").innerText = `💬 Lép nói: ${config.status}`;
 
-  // Đổ Social Links (Giữ nguyên logic của m)
+  // Hiện thông báo/Tin mới
+  if (config.announcement) {
+    const announceEl = document.getElementById("announcement-bar");
+    announceEl.innerText = config.announcement;
+    announceEl.style.display = "block";
+  }
+
+  // Hiện Gmail
+  if (config.email) {
+    const mailEl = document.getElementById("display-mail");
+    mailEl.innerHTML = `<a href="mailto:${config.email}" class="mail-link">📩 ${config.email}</a>`;
+    mailEl.style.display = "inline-block";
+  }
+
+  // Đổ Social Links
   ['fb', 'ig', 'threads', 'tiktok', 'yt'].forEach(p => {
     const link = config[p + '_link'];
     const el = document.getElementById('link-' + p);
-    if (el) { el.href = link || '#'; el.style.display = link ? 'inline-block' : 'none'; }
+    if (el) { 
+      el.href = link || '#'; 
+      el.style.display = link ? 'inline-block' : 'none'; 
+    }
   });
 
-  // --- LOGIC PHÂN LOẠI KHÁCH HÀNG ---
+  // Logic chào mừng khách (Giữ nguyên của m)
   const welcomeEl = document.getElementById("welcome-msg");
   const history = JSON.parse(localStorage.getItem("viewed")) || [];
   const visitCount = parseInt(localStorage.getItem("visit_count") || "0");
-  
-  // Tăng số lần vào web
   localStorage.setItem("visit_count", visitCount + 1);
 
   if (visitCount === 0 && history.length === 0) {
-    // 1. Khách mới tinh
     welcomeEl.innerHTML = "Chào m! Lần đầu ghé tiệm Lép à? Xem đồ đi, ok lắm ^.^";
   } else {
-    // 2. Khách cũ - Tìm sở thích (Danh mục xem nhiều nhất)
     const categories = history.map(h => h.category).filter(Boolean);
-    let favoriteCat = "";
-    if (categories.length > 0) {
-      favoriteCat = categories.reduce((a, b, i, arr) => 
-        (arr.filter(v => v === a).length >= arr.filter(v => v === b).length ? a : b)
-      );
-    }
+    let favoriteCat = categories.length > 0 ? categories.reduce((a, b, i, arr) => 
+        (arr.filter(v => v === a).length >= arr.filter(v => v === b).length ? a : b)) : "";
 
     if (favoriteCat) {
       welcomeEl.innerHTML = `Quay lại rồi à? Nhìn m là biết vẫn đang mê mấy món <b>${favoriteCat}</b> rồi!`;
     } else if (history.length > 0) {
-      const lastItem = history[history.length - 1].name;
-      welcomeEl.innerHTML = `Vẫn đang tia cái <b>${lastItem}</b> à? Mua lẹ đi !^^`;
+      welcomeEl.innerHTML = `Vẫn đang tia cái <b>${history[history.length - 1].name}</b> à? Mua lẹ đi !^^`;
     } else {
       welcomeEl.innerHTML = "Lại là m à? Lần này định vào ngó gì nào?";
     }
   }
 }
 
+// Các hàm loadProducts, renderProducts, filterProducts... giữ nguyên như cũ
 async function loadProducts() {
     const { data, error } = await supabaseClient.from("Products").select("*");
     if (error) return;
@@ -90,12 +100,9 @@ function filterProducts(category, btn) {
 
 async function handleInteraction(id, name, category) {
     await supabaseClient.rpc('increment_click', { row_id: id });
-
     let history = JSON.parse(localStorage.getItem("viewed")) || [];
-    // Lưu cả category để sau này đoán sở thích
     history.push({id, name, category, time: Date.now()});
-    localStorage.setItem("viewed", JSON.stringify(history.slice(-15))); // Lưu 15 món gần nhất
-    
+    localStorage.setItem("viewed", JSON.stringify(history.slice(-15)));
     const welcomeMsg = document.getElementById("welcome-msg");
     if(welcomeMsg) welcomeMsg.innerHTML = `Thích món <b>${name}</b> này rồi chứ gì? Mua đi!`;
 }

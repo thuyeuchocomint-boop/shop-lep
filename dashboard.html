@@ -1,12 +1,14 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html>
 <head>
-  <title>Admin - Lép là Leaf</title>
+  <title>Admin - Lép là Leaf 🌱</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; background: #f4f4f4; }
     section { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     input, textarea { width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; }
-    button { background: #5ed3c6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+    button { background: #5ed3c6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    .grid-links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -20,17 +22,38 @@
   <input id="new-announcement" placeholder="Tin tức mới nhất (Hiện trên cùng)">
   <textarea id="new-status" placeholder="Cảm nghĩ của Lép (Bong bóng chat)..."></textarea>
   
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+  <div class="grid-links">
     <input id="fb_link" placeholder="Link Facebook">
     <input id="tiktok_link" placeholder="Link TikTok">
     <input id="ig_link" placeholder="Link Instagram">
     <input id="threads_link" placeholder="Link Threads">
   </div>
-  <button onclick="saveAllSettings()" style="width:100%; margin-top:10px; background:#ff6b6b">Lưu toàn bộ thay đổi</button>
+  
+  <input id="email_contact" placeholder="Gmail liên hệ (Hiện trên Bio)">
+  
+  <button onclick="saveAllSettings()" style="width:100%; background:#ff6b6b">Lưu toàn bộ thay đổi</button>
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// Hàm lưu tất cả cho nhanh
+const supabaseClient = supabase.createClient(
+  "https://ebraxafpawypwmntoglw.supabase.co",
+  "sb_publishable_DhXag1beuBobuA8n4580Eg_hPUZJ9P0"
+);
+
+// Tự động load dữ liệu cũ lên cho m sửa
+async function loadCurrentSettings() {
+  const { data } = await supabaseClient.from("Settings").select("*");
+  if (data) {
+    data.forEach(s => {
+      // Tìm đúng ID để đổ dữ liệu vào, riêng 'email' thì đổ vào 'email_contact'
+      const id = s.key === 'email' ? 'email_contact' : (s.key === 'avatar' ? 'new-avatar' : (s.key === 'bio' ? 'new-bio' : (s.key === 'status' ? 'new-status' : (s.key === 'announcement' ? 'new-announcement' : s.key))));
+      const el = document.getElementById(id);
+      if (el) el.value = s.value;
+    });
+  }
+}
+
 async function saveAllSettings() {
   const settings = {
     avatar: document.getElementById("new-avatar").value,
@@ -40,12 +63,18 @@ async function saveAllSettings() {
     fb_link: document.getElementById("fb_link").value,
     tiktok_link: document.getElementById("tiktok_link").value,
     ig_link: document.getElementById("ig_link").value,
-    threads_link: document.getElementById("threads_link").value
+    threads_link: document.getElementById("threads_link").value,
+    email: document.getElementById("email_contact").value // Lưu vào key 'email'
   };
 
   for (const [key, value] of Object.entries(settings)) {
-    if(value) await supabaseClient.from("Settings").upsert({ key, value });
+    // Luôn cập nhật để đảm bảo thông tin mới nhất
+    await supabaseClient.from("Settings").upsert({ key, value });
   }
-  alert("Cập nhật xong rồi đấy m!");
+  alert("Cập nhật xong rồi đấy m! Ra web check nhé.");
 }
+
+loadCurrentSettings();
 </script>
+</body>
+</html>
