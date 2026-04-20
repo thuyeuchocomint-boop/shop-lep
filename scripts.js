@@ -314,5 +314,161 @@ async function loadAIChat(id) {
         });
     }
 }
+/* =========================
+   🚀 LÉP UPGRADE SYSTEM V2
+   ========================= */
+
+/* ---------- 1. CACHE DATA ---------- */
+let cachedProducts = null;
+
+async function loadProductsSmart() {
+  if (cachedProducts) return cachedProducts;
+
+  const { data, error } = await supabase
+    .from("products")
+    .select("*");
+
+  if (error) {
+    console.error("Lỗi load:", error);
+    return [];
+  }
+
+  cachedProducts = data;
+  return data;
+}
+
+/* ---------- 2. USER PROFILE ---------- */
+function saveUserProfile(profile) {
+  localStorage.setItem("lep_user_profile", JSON.stringify(profile));
+}
+
+function getUserProfile() {
+  return JSON.parse(localStorage.getItem("lep_user_profile"));
+}
+
+function isNewUser() {
+  return !localStorage.getItem("lep_user_profile");
+}
+
+/* ---------- 3. QUIZ SYSTEM ---------- */
+let currentProfile = {};
+
+function renderQuiz() {
+  const app = document.getElementById("app");
+
+  app.innerHTML = `
+    <div class="quiz-box">
+      <h2>👀 Tìm món hợp vibe bạn</h2>
+
+      <p>Bạn đang cần gì?</p>
+      <div class="quiz-options">
+        <button onclick="selectNeed('beauty')">Làm đẹp</button>
+        <button onclick="selectNeed('relax')">Thư giãn</button>
+        <button onclick="selectNeed('study')">Học tập</button>
+        <button onclick="selectNeed('gift')">Quà tặng</button>
+      </div>
+
+      <p>Ngân sách?</p>
+      <div class="quiz-options">
+        <button onclick="selectBudget(100)">Dưới 100k</button>
+        <button onclick="selectBudget(300)">100–300k</button>
+        <button onclick="selectBudget(9999)">Trên 300k</button>
+      </div>
+
+      <p>Phong cách?</p>
+      <div class="quiz-options">
+        <button onclick="selectVibe('cute')">Cute</button>
+        <button onclick="selectVibe('chill')">Chill</button>
+        <button onclick="selectVibe('lux')">Sang</button>
+      </div>
+
+      <button onclick="finishQuiz()" class="finish-btn">
+        Xem gợi ý 🔥
+      </button>
+    </div>
+  `;
+}
+
+function selectNeed(v) { currentProfile.need = v; }
+function selectBudget(v) { currentProfile.budget = v; }
+function selectVibe(v) { currentProfile.vibe = v; }
+
+function finishQuiz() {
+  saveUserProfile(currentProfile);
+  location.reload();
+}
+
+/* ---------- 4. FILTER THÔNG MINH ---------- */
+function filterProductsSmart(products, profile) {
+  return products.filter(p => {
+    return (
+      (!profile.need || p.category === profile.need) &&
+      (!profile.vibe || p.vibe === profile.vibe) &&
+      (!profile.budget || p.price <= profile.budget)
+    );
+  });
+}
+
+/* ---------- 5. RENDER UI ---------- */
+function renderProductsSmart(products, title = "✨ Gợi ý cho bạn") {
+  const app = document.getElementById("app");
+
+  if (!products.length) {
+    app.innerHTML = `<p>😢 Chưa có sản phẩm phù hợp</p>`;
+    return;
+  }
+
+  app.innerHTML = `
+    <h2>${title}</h2>
+    <div class="lep-grid">
+      ${products.map(p => `
+        <div class="lep-card">
+          <img src="${p.image}" />
+          <h3>${p.name}</h3>
+          <p>${p.price}k</p>
+          <a href="${p.link}" target="_blank">Xem ngay</a>
+        </div>
+      `).join("")}
+    </div>
+
+    <button onclick="resetProfile()" class="reset-btn">
+      🔄 Chọn lại
+    </button>
+  `;
+}
+
+/* ---------- 6. RESET ---------- */
+function resetProfile() {
+  localStorage.removeItem("lep_user_profile");
+  location.reload();
+}
+
+/* ---------- 7. TRACK HÀNH VI ---------- */
+function trackClick(productName) {
+  let history = JSON.parse(localStorage.getItem("lep_history")) || [];
+  history.push(productName);
+  localStorage.setItem("lep_history", JSON.stringify(history));
+}
+
+/* ---------- 8. INIT ---------- */
+async function initLEP() {
+  const products = await loadProductsSmart();
+
+  if (isNewUser()) {
+    renderQuiz();
+  } else {
+    const profile = getUserProfile();
+    const filtered = filterProductsSmart(products, profile);
+
+    renderProductsSmart(filtered);
+
+    // fallback nếu lọc quá ít
+    if (filtered.length < 2) {
+      renderProductsSmart(products, "🔥 Hot cho bạn");
+    }
+  }
+}
+
+initLEP();
 /* --- KHỞI CHẠY --- */
 init();
