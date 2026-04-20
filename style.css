@@ -567,3 +567,44 @@ body {
     background: white !important;
     color: var(--main-color) !important;
 }
+.quiz-box {
+  text-align: center;
+}
+
+.quiz-options button {
+  margin: 5px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: none;
+  background: #ffe4ec;
+}
+
+.finish-btn {
+  margin-top: 10px;
+  padding: 10px;
+  background: pink;
+  border: none;
+  border-radius: 12px;
+}
+
+.lep-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.lep-card {
+  background: white;
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.lep-card img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+.reset-btn {
+  margin-top: 10px;
+}
