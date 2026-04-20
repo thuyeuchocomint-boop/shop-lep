@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lép là Leaf 🌱 Tiệm nhỏ của Lép</title>
@@ -119,6 +120,14 @@
     </style>
 </head>
 <body>
+    <div id="lep-chat-widget">
+        <div class="chat-header" onclick="toggleChat()">Hỏi con Lép 🐰</div>
+        <div id="chat-body" class="hidden">
+            <div id="chat-content"></div>
+            <div id="options-area"></div>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
 
 <header>
     <img id="display-avatar" src="https://via.placeholder.com/150" alt="Lép">
