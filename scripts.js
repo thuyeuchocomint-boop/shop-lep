@@ -228,5 +228,44 @@ async function init() {
         showQuiz();
     }, 1000); // Đợi 1 giây cho mượt rồi mới hiện
 }
+// Load dữ liệu khảo sát cũ lên form
+async function loadQuizData() {
+    const { data } = await supabaseClient.from("Settings").select("*").eq("key", "quiz_config").maybeSingle();
+    if (data) {
+        const config = JSON.parse(data.value);
+        document.getElementById("quiz-question").value = config.question || "";
+        document.getElementById("opt-a").value = config.options[0].text || "";
+        document.getElementById("val-a").value = config.options[0].value || "";
+        document.getElementById("opt-b").value = config.options[1].text || "";
+        document.getElementById("val-b").value = config.options[1].value || "";
+    }
+}
+
+// Lưu cấu hình khảo sát mới
+async function saveQuizConfig() {
+    const config = {
+        question: document.getElementById("quiz-question").value,
+        options: [
+            { text: document.getElementById("opt-a").value, value: document.getElementById("val-a").value },
+            { text: document.getElementById("opt-b").value, value: document.getElementById("val-b").value }
+        ]
+    };
+
+    const { error } = await supabaseClient
+        .from("Settings")
+        .upsert({ key: "quiz_config", value: JSON.stringify(config) });
+
+    if (!error) {
+        alert("Đã cập nhật khảo sát! Giờ con Lép sẽ hỏi khách theo ý mày.");
+    } else {
+        alert("Lỗi rồi m ơi: " + error.message);
+    }
+}
+
+// Cập nhật hàm loadData chính để gọi thêm quiz
+async function loadData() {
+    // ... code cũ của t ...
+    await loadQuizData();
+}
 /* --- KHỞI CHẠY --- */
 init();

@@ -157,12 +157,80 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="scripts.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // Click 5 lần vào avatar để vào admin
-    let clicks = 0;
+    const supabaseClient = supabase.createClient("YOUR_URL", "YOUR_KEY");
+
+    // 1. LẤY STATUS & ẢNH MỚI NHẤT TỪ DASHBOARD
+    async function loadLatestPost() {
+        const { data, error } = await supabaseClient
+            .from('posts')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+        if (data) {
+            const statusSpan = document.getElementById("display-status");
+            const avatarImg = document.getElementById("display-avatar");
+            const statusArea = document.getElementById("status-area");
+
+            statusArea.style.display = "flex";
+            statusSpan.innerText = "💬 " + data.content;
+            if (data.image_url) {
+                avatarImg.src = data.image_url; // Đổi avatar thành ảnh m vừa đăng
+            }
+        }
+    }
+
+    // 2. GHI NHẬN CLICK KHI KHÁCH BẤM MUA
+    async function trackClick(productId, affiliateLink) {
+        // Gửi lệnh insert vào bảng clicks
+        await supabaseClient
+            .from('clicks')
+            .insert([{ product_id: productId }]);
+
+        // Sau khi ghi nhận xong thì mới chuyển hướng sang Shopee/Lazada
+        window.open(affiliateLink, '_blank');
+    }
+
+    // 3. LOAD DANH SÁCH SẢN PHẨM
+    async function loadProducts() {
+        const { data: products, error } = await supabaseClient
+            .from('products')
+            .select('*');
+
+        if (products) {
+            const shopContainer = document.getElementById("shop");
+            shopContainer.innerHTML = products.map(p => `
+                <div class="card">
+                    <span class="category-tag">Xịn</span>
+                    <img src="${p.image || 'https://via.placeholder.com/150'}" alt="${p.name}">
+                    <h4>${p.name}</h4>
+                    <p class="price">Đồ xịn Lép chọn</p>
+                    <button class="go-btn" onclick="trackClick('${p.id}', '${p.link}')">Mua ngay</button>
+                </div>
+            `).join("");
+        }
+    }
+
+    // 4. CLICK 5 LẦN VÀO AVATAR ĐỂ VÀO ADMIN
+    let avatarClicks = 0;
     document.getElementById("display-avatar").onclick = () => {
-        clicks++;
-        if (clicks === 5) window.location.href = "admin.html";
+        avatarClicks++;
+        if (avatarClicks === 5) window.location.href = "admin.html";
+    };
+
+    // CHẠY KHI TRANG LOAD XONG
+    window.onload = () => {
+        loadLatestPost();
+        loadProducts();
+        
+        // Load thông tin Gmail (nếu m có bảng Settings)
+        supabaseClient.from("Settings").select("value").eq("key", "admin_gmail").maybeSingle()
+            .then(({data}) => {
+                if(data) document.getElementById("display-gmail").innerText = data.value;
+            });
     };
 </script>
 
