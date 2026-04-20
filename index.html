@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lép là Leaf 🌿</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="nav">
+            <div class="logo">Lép là Leaf</div>
+            <div class="socials">
+                <small id="user-greeting"></small>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <div class="lep-wrapper">
+                <img id="lep" src="assets/lep-idle.png" alt="Lép">
+                <p id="lep-text">"Mày lại vào đây đốt tiền hả con Trang?"</p>
+            </div>
+            
+            <div id="mood-selector" style="margin-top: 20px;">
+                <button class="tab" onclick="setMood('happy')">✨ Đang vui</button>
+                <button class="tab" onclick="setMood('tired')">💤 Hơi đuối</button>
+            </div>
+        </section>
+
+        <div class="category-tabs">
+            <button class="tab" data-category="skincare">Skincare</button>
+            <button class="tab" data-category="decor">Decor</button>
+        </div>
+
+        <div id="products" class="product-grid">
+            </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
