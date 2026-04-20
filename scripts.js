@@ -267,5 +267,52 @@ async function loadData() {
     // ... code cũ của t ...
     await loadQuizData();
 }
+
+// --- PHẦN AI CHAT MỚI ---
+const URL_SB = 'URL_CUA_MAY';
+const KEY_SB = 'KEY_CUA_MAY';
+const _client = supabase.createClient(URL_SB, KEY_SB);
+
+// Logic cho Admin
+const btnSave = document.getElementById('save-flow-btn');
+if (btnSave) {
+    btnSave.onclick = async () => {
+        const id = document.getElementById('node-id').value;
+        const msg = document.getElementById('node-msg').value;
+        const opts = document.getElementById('node-options').value.split(',').map(i => {
+            const [t, n] = i.split('|');
+            return { text: t.trim(), next: n.trim() };
+        });
+        await _client.from('bot_flows').upsert({ node_id: id, message: msg, options: opts }, { onConflict: 'node_id' });
+        alert('Đã nạp kiến thức cho Lép!');
+    };
+}
+
+// Logic cho Khách (Chat)
+window.toggleChat = () => {
+    const body = document.getElementById('chat-body');
+    body.classList.toggle('hidden');
+    if (!body.classList.contains('hidden')) loadAIChat('bat-dau');
+};
+
+async function loadAIChat(id) {
+    const { data } = await _client.from('bot_flows').select('*').eq('node_id', id).single();
+    if (data) {
+        const content = document.getElementById('chat-content');
+        content.innerHTML += `<div class="bot-msg"><b>Lép:</b> ${data.message}</div>`;
+        
+        const area = document.getElementById('options-area');
+        area.innerHTML = '';
+        data.options.forEach(o => {
+            const b = document.createElement('button');
+            b.innerText = o.text;
+            b.onclick = () => {
+                content.innerHTML += `<div class="user-msg"><b>Mày:</b> ${o.text}</div>`;
+                loadAIChat(o.next);
+            };
+            area.appendChild(b);
+        });
+    }
+}
 /* --- KHỞI CHẠY --- */
 init();
