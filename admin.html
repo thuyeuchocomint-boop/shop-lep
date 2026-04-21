@@ -2,46 +2,84 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lép Control Center 🛠️</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <link rel="stylesheet" href="style.css">
     <style>
-        .admin-section { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        input, textarea, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { background: #4CAF50; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: bold; }
-        .stats-box { display: flex; gap: 20px; margin-bottom: 20px; }
-        .stat-card { background: #e8f5e9; padding: 15px; border-radius: 10px; flex: 1; text-align: center; }
+        body { background: #fafaf9; font-family: sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .admin-section { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        h2 { text-align: center; color: #558b2f; }
+        h3 { margin-top: 0; }
+        input, textarea { width: 100%; padding: 10px; margin: 6px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        textarea { resize: none; height: 80px; }
+        .btn { background: #558b2f; color: white; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn-logout { background: #ff4757; width: auto; padding: 8px 15px; margin-bottom: 20px; }
+        .fun { font-size: 0.8rem; color: #888; text-align: center; margin-top: 5px; }
+        
+        /* Overlay bảo mật - Cho z-index cực cao và đảm bảo nhận diện click */
+        #admin-auth {
+            position: fixed; inset: 0; background: #fafaf9; z-index: 10000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 15px; pointer-events: auto;
+        }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h2>Lép Control Center 🌿</h2>
-        
-        <div class="stats-box">
-            <div class="stat-card">Tổng Click: <span id="total-clicks">0</span></div>
-            <div class="stat-card">Hoa hồng dự kiến: <span id="total-money">0đ</span></div>
-        </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-        <div class="admin-section">
-            <h3>Đăng bài mới (Blog/Sản phẩm)</h3>
-            <select id="post-type">
-                <option value="blog">Đăng Blog/Status</option>
-                <option value="product">Thêm link Affiliate mới</option>
-            </select>
-            <input type="text" id="post-title" placeholder="Tiêu đề (Tên sản phẩm hoặc tiêu đề blog)">
-            <textarea id="post-body" placeholder="Nội dung/Review..."></textarea>
-            <input type="text" id="post-image" placeholder="Dán link ảnh vào đây (URL)">
-            <input type="text" id="post-link" placeholder="Dán link Affiliate (nếu là sản phẩm)">
-            <button onclick="saveContent()">Đăng lên Web ngay</button>
-        </div>
+    <div id="admin-auth">
+        <img src="assets/lep-idle.png" alt="Lép" style="width: 80px;" onerror="this.style.display='none'">
+        <h3>Quyền lực của Lép 🌿</h3>
+        <input type="email" id="login-email" placeholder="Email admin" style="width: 280px;">
+        <input type="password" id="admin-pass" placeholder="Mật khẩu" style="width: 280px;">
+        <button class="btn" onclick="loginAdmin()" style="width: 280px;">Vào việc 🚀</button>
+        <div class="fun">Nhập đúng mail m đã tạo trên Supabase nhé!</div>
+    </div>
 
-        <div class="admin-section">
-            <h3>Chỉnh sửa giao diện Lép</h3>
-            <label>Link Avatar của Lép hiện tại:</label>
-            <input type="text" id="set-avatar" placeholder="Dán link ảnh con Lép mới">
-            <button onclick="saveSettings()">Cập nhật Avatar & Social</button>
+    <div id="admin-content" style="display: none;">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Lép Control Center 🛠️</h2>
+                <button class="btn btn-logout" onclick="logout()">Đăng xuất</button>
+            </div>
+
+            <div class="grid">
+                <div class="admin-section">
+                    <h3>🛒 Đăng sản phẩm mới</h3>
+                    <input id="p-name" placeholder="Tên sản phẩm">
+                    <input id="p-price" placeholder="Giá (vd: 199k)">
+                    <input id="p-link" placeholder="Link Shopee / Affiliate">
+                    <input id="p-category" placeholder="Category">
+                    <label style="font-size: 0.8rem; font-weight: bold; margin-top: 10px; display: block;">📸 Ảnh sản phẩm:</label>
+                    <input type="file" id="p-file">
+                    <button class="btn" onclick="uploadToSupabase()">Đẩy lên 🚀</button>
+                    <div id="status-msg" class="fun"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>⚙️ Chỉnh sửa thông tin Lép</h3>
+                    <textarea id="bio" placeholder="Bio cá nhân..."></textarea>
+                    <label style="font-size: 0.8rem; font-weight: bold; display: block;">📸 Thay Avatar (File ảnh):</label>
+                    <input type="file" id="avatar-file">
+                    
+                    <input id="facebook" placeholder="Link Facebook">
+                    <input id="tiktok" placeholder="Link TikTok">
+                    <input id="email-contact" placeholder="Email liên hệ khách">
+                    <input id="phone" placeholder="Số điện thoại">
+
+                    <label style="margin-top: 10px; display: block;">🎨 Màu chủ đạo web:</label>
+                    <input type="color" id="primary_color">
+                    <input id="weather" placeholder="Thành phố (Hanoi)">
+
+                    <button class="btn" onclick="saveConfig()">Lưu cấu hình 🧠</button>
+                    <div id="config-msg" class="fun"></div>
+                </div>
+            </div>
         </div>
     </div>
+
     <script type="module" src="admin.js"></script>
 </body>
 </html>

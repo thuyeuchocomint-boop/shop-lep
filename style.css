@@ -1,22 +1,23 @@
 :root {
-    --primary: #558b2f; /* Xanh lá Lép đậm chất */
-    --primary-light: #e8f5e9;
-    --bg: #fafaf9; /* Màu giấy hơi beige nhẹ, cực kỳ dịu mắt */
-    --text: #2d3436;
-    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --primary: #558b2f; 
+    --bg: #fafaf9; /* Màu mặc định */
 }
-
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
-    font-family: 'Inter', 'Be Vietnam Pro', sans-serif;
-    background-color: var(--bg);
-    color: var(--text);
-    margin: 0; line-height: 1.6;
-    transition: background 0.8s ease;
+    background-color: var(--bg) !important; /* Quan trọng nhất là dòng này */
+    transition: background-color 0.8s ease, color 0.8s ease;
 }
 
+/* Đảm bảo các khối nội dung cũng phải trong suốt hoặc đổi màu theo */
+.hero, .admin-section {
+    background-color: rgba(255, 255, 255, 0.8); /* Trắng nhẹ để lộ màu nền bên dưới */
+    backdrop-filter: blur(10px);
+}
+
+/* Các thành phần dùng chung màu nền card */
+.hero, .product-card, .ai-window, .admin-section {
+    background-color: var(--card-bg);
+}
 .container { max-width: 480px; margin: 0 auto; padding: 0 20px; }
 
 /* Navbar xịn xò */
@@ -75,3 +76,185 @@ body {
 /* Hiệu ứng Mood cho body */
 body.mood-tired { --bg: #f1f2f6; filter: sepia(10%); }
 body.mood-happy { --bg: #fffcf0; }
+:root {
+    --primary: #558b2f;
+    --primary-light: #e8f5e9;
+    --bg: #fafaf9;
+    --text: #2d3436;
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Chỉnh lại nhanh hơn chút cho mượt */
+}
+
+/* SỬA LỖI LIỆT: Đảm bảo mọi thứ có thể nhận diện click */
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+}
+
+body {
+    font-family: 'Inter', 'Be Vietnam Pro', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0; 
+    line-height: 1.6;
+    transition: background 0.8s ease;
+    overflow-x: hidden; /* Tránh tràn ngang trên mobile */
+}
+
+/* Nâng cấp Card để "Bấm phát ăn ngay" */
+.product-card {
+    display: block; /* Bắt buộc để thẻ a bao trùm nội dung */
+    text-decoration: none; /* Bỏ gạch chân nếu m dùng thẻ a */
+    color: inherit;
+    background: white; 
+    border-radius: 24px; 
+    overflow: hidden;
+    transition: var(--transition); 
+    border: 1px solid rgba(0,0,0,0.02);
+    box-shadow: var(--card-shadow); 
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+}
+
+/* Hiệu ứng khi di chuột (PC) */
+.product-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 20px 40px rgba(85, 139, 47, 0.12); /* Đổ bóng màu xanh nhẹ của Lép */
+    border-color: var(--primary-light);
+}
+
+/* Hiệu ứng khi chạm (Mobile) - Quan trọng để sửa lỗi cảm giác nút bị liệt */
+.product-card:active, .tab:active {
+    transform: scale(0.95); /* Co nhẹ lại khi nhấn vào */
+    opacity: 0.9;
+}
+
+/* Sửa lỗi cuộn Tab bị cứng trên iPhone */
+.category-tabs {
+    display: flex; 
+    gap: 12px; 
+    overflow-x: auto; 
+    padding: 15px 5px;
+    scrollbar-width: none; /* Ẩn thanh cuộn */
+    -webkit-overflow-scrolling: touch; /* Cuộn mượt kiểu iOS */
+}
+.category-tabs::-webkit-scrollbar { display: none; }
+
+/* Bổ sung nút "Xem" giả để người dùng biết là bấm được */
+.product-info { 
+    padding: 12px; 
+    position: relative;
+}
+.product-info::after {
+    content: '→';
+    position: absolute;
+    right: 15px;
+    bottom: 12px;
+    color: var(--primary);
+    font-weight: bold;
+    opacity: 0.5;
+}
+#lep {
+    width: 130px;
+    height: 130px; /* Thêm chiều cao bằng chiều rộng */
+    object-fit: cover; /* Giúp ảnh không bị méo */
+    border-radius: 50%; /* Bo tròn hoàn toàn thành hình tròn */
+    border: 4px solid white; /* Thêm viền trắng cho nổi */
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+    animation: float 4s infinite ease-in-out;
+    background-color: var(--primary-light); /* Nền nhẹ nếu ảnh bị trong suốt */
+}
+
+/* Hiệu ứng hover cho AVT */
+#lep:hover {
+    transform: rotate(10deg) scale(1.1); /* Nhìn xéo sắc hơn khi di chuột vào */
+    cursor: pointer;
+}
+/* Hiệu ứng thẻ sản phẩm sang chảnh */
+.product-card {
+    border: none;
+    border-radius: 20px;
+    background: #ffffff;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    display: block;
+    text-decoration: none;
+    color: #333;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.product-card:hover {
+    transform: translateY(-10px); /* Bay nhẹ lên khi di chuột */
+    box-shadow: 0 15px 30px rgba(85, 139, 47, 0.2);
+}
+
+.product-img {
+    width: 100%;
+    aspect-ratio: 1/1; /* Ảnh luôn vuông cho đều */
+    object-fit: cover;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.product-info {
+    padding: 15px;
+}
+
+.product-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+    height: 2.8em; /* Giới hạn 2 dòng cho đều */
+    overflow: hidden;
+}
+
+.product-price {
+    color: #558b2f;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+.lep-weather-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    margin-top: 6px;
+    opacity: 0.9;
+}
+
+.lep-weather-box img {
+    width: 32px;
+    height: 32px;
+}
+
+/* mood */
+body.rainy {
+    filter: brightness(0.95);
+}
+
+body.sunny {
+    filter: saturate(1.1);
+}
+.lep-socials {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+    font-size: 14px;
+}
+
+.lep-socials a {
+    color: var(--primary);
+    text-decoration: none;
+}
+.ai-box { position: fixed; bottom: 20px; right: 20px; z-index: 1000; font-size: 14px; }
+.chat-bubble { background: var(--primary); color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+.ai-window { width: 280px; height: 350px; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; margin-bottom: 10px; }
+.ai-window.hidden { display: none; }
+.ai-header { background: #f5f5f5; padding: 10px; display: flex; justify-content: space-between; border-bottom: 1px solid #eee; }
+.ai-content { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+.bot-msg { background: var(--primary-light); padding: 8px 12px; border-radius: 12px 12px 12px 0; align-self: flex-start; }
+.user-msg { background: #eee; padding: 8px 12px; border-radius: 12px 12px 0 12px; align-self: flex-end; }
+.quiz-btn { background: white; border: 1px solid var(--primary); color: var(--primary); padding: 5px 10px; border-radius: 10px; cursor: pointer; margin-bottom: 5px; font-size: 12px; }
+.ai-input-area { padding: 10px; border-top: 1px solid #eee; display: flex; gap: 5px; }
+.ai-input-area input { flex: 1; border: 1px solid #ddd; border-radius: 10px; padding: 5px; }

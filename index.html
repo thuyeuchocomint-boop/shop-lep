@@ -21,8 +21,19 @@
             <div class="lep-wrapper">
                 <img id="lep" src="assets/lep-idle.png" alt="Lép">
                 <p id="lep-text">"Mày lại vào đây đốt tiền hả con Trang?"</p>
+                <p id="lep-bio" style="opacity: 0.7;"></p>
+                <div class="lep-socials">
+                    <a id="link-fb" target="_blank">Facebook</a>
+                    <a id="link-tiktok" target="_blank">TikTok</a>
+                    <a id="link-email">Email</a>
+                    <a id="link-phone">Phone</a>
+                </div>
             </div>
-            
+            <div class="theme-switch" style="text-align: center; margin-bottom: 10px;">
+                <button onclick="setTheme('light')" class="tab">☀️ Sáng</button>
+                <button onclick="setTheme('dark')" class="tab">🌙 Tối</button>
+                <button onclick="setTheme('mint')" class="tab">🌿 Mint</button>
+            </div>
             <div id="mood-selector" style="margin-top: 20px;">
                 <button class="tab" onclick="setMood('happy')">✨ Đang vui</button>
                 <button class="tab" onclick="setMood('tired')">💤 Hơi đuối</button>
@@ -30,12 +41,24 @@
         </section>
 
         <div class="category-tabs">
+            <button class="tab active" data-category="all">Tất cả</button>
             <button class="tab" data-category="skincare">Skincare</button>
             <button class="tab" data-category="decor">Decor</button>
         </div>
 
-        <div id="products" class="product-grid">
-            </div>
+        <div id="products" class="product-grid"></div> 
+    </div>
+
+    <div class="lep-weather-box">
+        <img id="lep-weather-icon" />
+        <span id="lep-weather"></span>
+    </div>
+    <div id="ai-chat-box" style="position:fixed; bottom:20px; right:20px; z-index:999;">
+        <button id="start-quiz" class="tab" style="background:var(--primary); color:white;">Cần Lép tư vấn? 🐰</button>
+        <div id="quiz-container" style="display:none; background:white; padding:15px; border-radius:15px; box-shadow:0 0 20px rgba(0,0,0,0.1); width:250px;">
+            <p id="quiz-question">Mày đang tìm đồ gì?</p>
+            <div id="quiz-answers"></div>
+        </div>
     </div>
 
     <script type="module" src="app.js"></script>
