@@ -23,6 +23,125 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 15px; pointer-events: auto;
         }
+        .appearance-section {
+            grid-column: 1 / -1;
+            border: 1px solid #e4efe9;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fcfa 100%);
+        }
+        .appearance-title {
+            margin-bottom: 6px;
+            color: #2f7d5e;
+        }
+        .appearance-sub {
+            margin: 0 0 16px;
+            color: #7b8f86;
+            font-size: 0.9rem;
+        }
+        .appearance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .upload-card {
+            border: 1px dashed #bfd9ce;
+            border-radius: 12px;
+            padding: 14px;
+            background: #ffffff;
+        }
+        .upload-card label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2d463b;
+            font-size: 0.9rem;
+        }
+        .preview-box {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 10px;
+            border: 1px solid #e5efea;
+            overflow: hidden;
+            background: #f3f7f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8ea69b;
+            font-size: 0.82rem;
+            margin-bottom: 10px;
+        }
+        .preview-box.preview-avatar {
+            aspect-ratio: 1 / 1;
+            max-width: 200px;
+        }
+        .preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        .appearance-actions {
+            margin-top: 16px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        #appearance-msg {
+            text-align: right;
+            margin-top: 8px;
+        }
+        .social-section {
+            grid-column: 1 / -1;
+        }
+        .social-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .social-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+        .btn-light {
+            background: #e9f5ef;
+            color: #2f7d5e;
+            border: 1px solid #cfe7dc;
+        }
+        .btn-danger {
+            width: auto;
+            margin-top: 0;
+            padding: 10px 12px;
+            background: #ef5350;
+        }
+        #social-links-msg {
+            margin-top: 8px;
+        }
+        .status-section {
+            grid-column: 1 / -1;
+        }
+        #status-text {
+            min-height: 90px;
+            resize: vertical;
+        }
+        #status-msg-admin {
+            margin-top: 8px;
+        }
+        @media (max-width: 860px) {
+            .grid,
+            .appearance-grid {
+                grid-template-columns: 1fr;
+            }
+            .social-row {
+                grid-template-columns: 1fr;
+            }
+            .appearance-actions .btn {
+                width: 100%;
+            }
+            #appearance-msg {
+                text-align: center;
+            }
+        }
     </style>
 </head>
 
@@ -30,7 +149,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
     <div id="admin-auth">
-        <img src="assets/lep-idle.png" alt="Lép" style="width: 80px;" onerror="this.style.display='none'">
+        <img src="https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=240&q=80" alt="Lép" style="width: 80px;" onerror="this.src='https://placehold.co/240x240/e6f7f2/2f8c74?text=Lep'">
         <h3>Quyền lực của Lép 🌿</h3>
         <input type="email" id="login-email" placeholder="Email admin" style="width: 280px;">
         <input type="password" id="admin-pass" placeholder="Mật khẩu" style="width: 280px;">
@@ -58,23 +177,58 @@
                     <div id="status-msg" class="fun"></div>
                 </div>
 
-                <div class="admin-section">
-                    <h3>⚙️ Chỉnh sửa thông tin Lép</h3>
-                    <textarea id="bio" placeholder="Bio cá nhân..."></textarea>
-                    <label style="font-size: 0.8rem; font-weight: bold; display: block;">📸 Thay Avatar (File ảnh):</label>
-                    <input type="file" id="avatar-file">
-                    
-                    <input id="facebook" placeholder="Link Facebook">
-                    <input id="tiktok" placeholder="Link TikTok">
-                    <input id="email-contact" placeholder="Email liên hệ khách">
-                    <input id="phone" placeholder="Số điện thoại">
+                <div class="admin-section appearance-section">
+                    <h3 class="appearance-title">🎨 Cài đặt giao diện</h3>
+                    <p class="appearance-sub">Upload thông minh 3 vùng riêng: Ảnh bìa, Avatar, Animation thỏ Lép.</p>
 
-                    <label style="margin-top: 10px; display: block;">🎨 Màu chủ đạo web:</label>
-                    <input type="color" id="primary_color">
-                    <input id="weather" placeholder="Thành phố (Hanoi)">
+                    <div class="appearance-grid">
+                        <div class="upload-card">
+                            <label for="cover-file">🖼️ Ảnh bìa</label>
+                            <div class="preview-box">
+                                <img id="cover-preview-img" alt="Preview ảnh bìa">
+                                <span id="cover-preview-placeholder">Chưa có ảnh bìa</span>
+                            </div>
+                            <input type="file" id="cover-file" accept="image/*" onchange="previewAppearanceImage(this, 'cover-preview-img', 'cover-preview-placeholder')">
+                        </div>
 
-                    <button class="btn" onclick="saveConfig()">Lưu cấu hình 🧠</button>
-                    <div id="config-msg" class="fun"></div>
+                        <div class="upload-card">
+                            <label for="appearance-avatar-file">🐰 Avatar</label>
+                            <div class="preview-box preview-avatar">
+                                <img id="avatar-preview-img" alt="Preview avatar">
+                                <span id="avatar-preview-placeholder">Chưa có avatar</span>
+                            </div>
+                            <input type="file" id="appearance-avatar-file" accept="image/*" onchange="previewAppearanceImage(this, 'avatar-preview-img', 'avatar-preview-placeholder')">
+                        </div>
+
+                        <div class="upload-card">
+                            <label for="animation-file">✨ Animation thỏ Lép</label>
+                            <div class="preview-box preview-avatar">
+                                <img id="animation-preview-img" alt="Preview animation thỏ Lép">
+                                <span id="animation-preview-placeholder">Chưa có animation</span>
+                            </div>
+                            <input type="file" id="animation-file" accept="image/*,.gif,.webp" onchange="previewAppearanceImage(this, 'animation-preview-img', 'animation-preview-placeholder')">
+                        </div>
+                    </div>
+
+                    <div class="appearance-actions">
+                        <button class="btn" style="width: 240px;" onclick="saveAppearanceSettings()">Lưu thay đổi</button>
+                    </div>
+                    <div id="appearance-msg" class="fun"></div>
+                </div>
+
+                <div class="admin-section social-section">
+                    <h3>🔗 Quản lý Social Links không giới hạn</h3>
+                    <button class="btn btn-light" type="button" onclick="addSocialLinkRow()">Thêm Link Social</button>
+                    <div id="social-links-list" class="social-list"></div>
+                    <button class="btn" type="button" onclick="saveSocialLinks()">Lưu danh sách Social</button>
+                    <div id="social-links-msg" class="fun"></div>
+                </div>
+
+                <div class="admin-section status-section">
+                    <h3>📢 Đăng status / cập nhật trạng thái</h3>
+                    <textarea id="status-text" placeholder="Ví dụ: Hôm nay Lép live lúc 20:00, săn deal skincare giá mềm nha!"></textarea>
+                    <button class="btn" type="button" onclick="saveStatusUpdate()">Đăng trạng thái</button>
+                    <div id="status-msg-admin" class="fun"></div>
                 </div>
             </div>
         </div>

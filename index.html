@@ -9,6 +9,38 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="rain-layer" aria-hidden="true"></div>
+    <button id="dark-mode-toggle" class="dark-toggle" type="button" aria-label="Bật tắt Dark Mode">🌙</button>
+    <header class="profile-header" id="lep-bio-section">
+        <div class="lep-cover-wrapper">
+            <img src="https://images.unsplash.com/photo-1516478177764-9fe5bd6f1358?auto=format&fit=crop&w=1400&q=80" alt="Ảnh bìa Lép là Leaf" id="lep-cover-img" class="lep-cover-image">
+        </div>
+
+        <div class="lep-profile-header">
+            <div class="lep-avatar-wrapper">
+                <img src="https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=400&q=80" alt="Avatar Thỏ Lép" id="lep" class="lep-avatar-image" onerror="this.src='https://placehold.co/400x400/e6f7f2/2f8c74?text=Lep'">
+            </div>
+
+            <div class="lep-info-wrapper">
+                <h1 class="lep-name" id="lep-display-name">Lép là Leaf</h1>
+                <p class="lep-username">@lepleaf.affiliate</p>
+                <p class="lep-quote" id="lep-text">"Mày lại vào đây đốt tiền hả con Trang?"</p>
+            </div>
+        </div>
+
+        <div class="lep-bio-text-wrapper">
+            <p class="lep-bio-content" id="lep-bio">
+                🌿 Chào m! T là Lép - chú thỏ xanh mint thông minh & hài hước. T ở đây để giúp m tìm ra những sản phẩm "chân ái", giá hời nhất. Bấm xem danh mục bên dưới nhé! 👇
+            </p>
+            <div class="lep-socials">
+                <a id="link-fb" target="_blank">Facebook</a>
+                <a id="link-tiktok" target="_blank">TikTok</a>
+                <a id="link-email">Email</a>
+                <a id="link-phone">Phone</a>
+            </div>
+
+        </div>
+    </header>
     <div class="container">
         <nav class="nav">
             <div class="logo">Lép là Leaf</div>
@@ -17,28 +49,10 @@
             </div>
         </nav>
 
-        <section class="hero">
-            <div class="lep-wrapper">
-                <img id="lep" src="assets/lep-idle.png" alt="Lép">
-                <p id="lep-text">"Mày lại vào đây đốt tiền hả con Trang?"</p>
-                <p id="lep-bio" style="opacity: 0.7;"></p>
-                <div class="lep-socials">
-                    <a id="link-fb" target="_blank">Facebook</a>
-                    <a id="link-tiktok" target="_blank">TikTok</a>
-                    <a id="link-email">Email</a>
-                    <a id="link-phone">Phone</a>
-                </div>
-            </div>
-            <div class="theme-switch" style="text-align: center; margin-bottom: 10px;">
-                <button onclick="setTheme('light')" class="tab">☀️ Sáng</button>
-                <button onclick="setTheme('dark')" class="tab">🌙 Tối</button>
-                <button onclick="setTheme('mint')" class="tab">🌿 Mint</button>
-            </div>
-            <div id="mood-selector" style="margin-top: 20px;">
-                <button class="tab" onclick="setMood('happy')">✨ Đang vui</button>
-                <button class="tab" onclick="setMood('tired')">💤 Hơi đuối</button>
-            </div>
-        </section>
+        <aside id="lep-status-board" class="lep-status-board hidden-panel">
+            <div class="status-title">Trạng thái mới từ Lép</div>
+            <div id="lep-status-text"></div>
+        </aside>
 
         <div class="category-tabs">
             <button class="tab active" data-category="all">Tất cả</button>
@@ -48,18 +62,21 @@
 
         <div id="products" class="product-grid"></div> 
     </div>
-
-    <div class="lep-weather-box">
-        <img id="lep-weather-icon" />
+    <div class="runtime-hidden">
+        <img id="lep-weather-icon" alt="weather icon">
         <span id="lep-weather"></span>
     </div>
-    <div id="ai-chat-box" style="position:fixed; bottom:20px; right:20px; z-index:999;">
-        <button id="start-quiz" class="tab" style="background:var(--primary); color:white;">Cần Lép tư vấn? 🐰</button>
-        <div id="quiz-container" style="display:none; background:white; padding:15px; border-radius:15px; box-shadow:0 0 20px rgba(0,0,0,0.1); width:250px;">
-            <p id="quiz-question">Mày đang tìm đồ gì?</p>
-            <div id="quiz-answers"></div>
+    <button id="lep-fab" class="lep-fab" type="button" aria-label="Mở tư vấn với thỏ Lép">
+        <img id="lep-fab-img" src="https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?auto=format&fit=crop&w=220&q=80" alt="Lép tư vấn" onerror="this.src='https://placehold.co/220x220/e6f7f2/2f8c74?text=Lep'">
+    </button>
+    <section id="lep-assistant-panel" class="lep-assistant-panel hidden-panel" aria-live="polite">
+        <div class="lep-assistant-header">
+            <strong>Lép Assistant</strong>
+            <button id="lep-panel-close" class="lep-panel-close" type="button" aria-label="Đóng bảng tư vấn">✕</button>
         </div>
-    </div>
+        <p>Chat AI/Quiz tư vấn sẽ được gắn vào đây ở bước tiếp theo.</p>
+        <button id="lep-panel-start" class="lep-panel-btn" type="button">Bắt đầu tư vấn</button>
+    </section>
 
     <script type="module" src="app.js"></script>
 </body>
